@@ -28,3 +28,5 @@ Customers can register, log in, add products to their cart, and place orders. Th
 Store managers can log in, manage products (add, edit, delete), manage categories, and view all orders placed by customers.
 
 Both users are able to search for products by name or category, and view product details.
+
+## TODO: Add more details about the features and functionalities of the e-commerce store, such as payment methods, shipping options, etc.
