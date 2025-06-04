@@ -24,7 +24,5 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 
 
 # TODO: add profile delete
-# TODO: add profile register
-# TODO: add profile login
 # TODO: add profile add to favourites
 # TODO: add profile details
