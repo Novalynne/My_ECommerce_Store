@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',  # Custom app for product management
     'shop.apps.ShopConfig',          # Custom app for order and cart management
     'reviews.apps.ReviewsConfig',    # Custom app for reviews
+    'cloudinary',                    # Cloudinary for media management
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ ROOT_URLCONF = 'MyECommerceStore.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],           # Directory for templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,7 +127,21 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/css'), #TODO: Add your CSS directory
                     os.path.join(BASE_DIR, 'static/javascript')] #TODO: Add your JavaScript directory
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Directory for images files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')         # Directory for images files, now that i save images in cloudinary this is not needed
+
+# Cloudinary configuration and Django integration
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+from cloudinary.utils import cloudinary_url
+
+cloudinary.config(
+    cloud_name = "dp2kjtvvp",
+    api_key = "454739172696662",
+    api_secret = "becZ12P9xoCMzbHVyK_7z_rEzfs",
+    secure=True
+)
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
