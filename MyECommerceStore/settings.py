@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'shop.apps.ShopConfig',          # Custom app for order and cart management
     'reviews.apps.ReviewsConfig',    # Custom app for reviews
     'cloudinary',                    # Cloudinary for media management
+    'crispy_forms',                  # For better form rendering
+    'crispy_bootstrap4',             # Bootstrap 5 integration for crispy forms
 ]
 
 MIDDLEWARE = [
@@ -73,6 +75,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'MyECommerceStore.wsgi.application'
 
@@ -147,3 +150,5 @@ cloudinary.config(
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
