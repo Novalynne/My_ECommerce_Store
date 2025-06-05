@@ -1,4 +1,62 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'homepage.css' %}">
+{% endblock css %}
+
+{% block title %}Home Page{% endblock title %}
+{% block navbar %}
+    {% if is_client %}
+        <a href="#" class="btn btn-outline-light me-2">
+            <i class="fa fa-heart"></i> Wishlist
+        </a>
+        <a href="#" class="btn btn-outline-light me-2">
+            <i class="fa-solid fa-cart-shopping"></i> Cart
+        </a>
+        <a href="#" class="btn btn-outline-light me-2">
+            <i class="fa-solid fa-truck-fast"></i> Orders
+        </a>
+    {% endif %}
+    {% if is_manager or is_admin %}
+        <a href="#" class="btn btn-outline-light me-2">
+            <i class="fa-solid fa-plus"></i> Add Product
+        </a>
+        <a href="#" class="btn btn-outline-light me-2">
+            <i class="fa-solid fa-truck"></i> View All Orders
+        </a>
+    {% endif %}
+
+    <a href="#" class="btn btn-outline-light me-2">
+        <i class="fa fa-user"></i> Account
+    </a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light me-2">
+        <i class="fa fa-sign-out"></i> Logout
+    </a>
+{% endblock %}
+
 {% block content %}
-    
+    <div class="product-grid">
+    {% for product in products %}
+        <div class="product-space">
+            <h3>{{ product.name }}</h3>
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150">
+            <div class="price-form-row mt-3">
+                <p><strong>€{{ product.price }}</strong></p> 
+                <form action="#" method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    {% if is_client %}
+                       <button type="submit"><i class="fa fa-heart"></i></button> 
+                    {% endif %}
+                    {% if is_manager or is_admin %}
+                        <button type="submit"><i class="fa-solid fa-pen-to-square"></i></button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
 {% endblock %}

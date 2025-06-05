@@ -37,8 +37,6 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.01'))],decimal_places=2)
     categories = models.ManyToManyField(Category, blank=True)
-    stock = models.PositiveIntegerField(validators=[MinValueValidator(0)], default=0) # Minimum stock is 0
-    size = models.ManyToManyField(Size, blank=True)
     image = CloudinaryField('image', blank=True, null=True, default='placeholder')
 
     class Meta:
@@ -51,8 +49,20 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse("product_detail", kwargs={"pk": self.pk}) #TODO: add urls.py
 
-    def recipe_delete(self):
+    def product_delete(self):
         return reverse("product_delete", kwargs={"pk": self.pk}) #TODO: add urls.py
 
-    def recipe_modify(self):
+    def product_modify(self):
         return reverse("product_modify", kwargs={"pk": self.pk}) #TODO: add urls.py
+
+
+class ProductStock(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stock')
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
+    stock = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('product', 'size')
+
+    def __str__(self):
+        return f"{self.product.name} - {self.size.name} (Stock: {self.stock})"
