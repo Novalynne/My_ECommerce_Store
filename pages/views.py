@@ -8,7 +8,7 @@ from pages.forms import SearchForm
 def frontpage(request):
     return render(request, 'front_page.html')
 
-class homepage(ListView):
+class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
     model = Product
     template_name = 'home_page.html'
     paginate_by = 10

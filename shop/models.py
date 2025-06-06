@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import Profile
-from products.models import Product
+from products.models import Product, Size
 from _decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
@@ -66,8 +66,9 @@ class OrderProduct(models.Model):
 
 class Cart(models.Model):
 
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="cart")
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="cart_user")
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="cart_product")
+    size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='cart_product_size', default='M')
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
 
     class Meta:

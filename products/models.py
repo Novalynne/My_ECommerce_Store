@@ -57,7 +57,7 @@ class Product(models.Model):
 
 
 class ProductStock(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stock')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
     stock = models.PositiveIntegerField(default=0)
 

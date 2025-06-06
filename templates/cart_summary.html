@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    {% for item in cart_products %}
+        <div class="card mb-4 inline">
+        <img src="{{ item.product.image.url }}" class="card-img-top" alt="{{ item.product.name }}">
+        <div>
+            <div class="card-header">
+                {{ item.product.name }} - ${{ item.product.price }}
+            </div>
+            <div class="card-body">
+                Quantity: {{ item.quantity }}<br/>
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+{% endblock %}

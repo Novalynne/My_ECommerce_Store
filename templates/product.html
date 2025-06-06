@@ -2,6 +2,13 @@
 {% load static %}
 
 {% block content %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
@@ -9,12 +16,22 @@
                     <img src="{{ product.image.url }}" class="card-img-top" alt=""/>
                     <div class="card-body text-center">
                         <h3 class="card-title">{{ product.name }}</h3>
+                        <ul class="list-unstyled">
+                            {% for product in sizes %}
+                                <li>{{ product.size.name }} (Disponibili: {{ product.stock }})</li>
+                            {% endfor %}
+                        </ul>
                         <p class="card-text text-muted">{{ product.description }}</p>
                         <h4 class="text-success mb-4">€ {{ product.price }}</h4>
                         <div class="d-flex justify-content-center gap-3 p-3">
                             {% if is_client %}
                                 <button type="submit"><i class="fa fa-heart"></i></button>
-                                <button class="btn btn-secondary w-100 mb-3">Add to cart</button>
+                                <form method="post" action="{% url 'add_to_cart' %}">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <button type="submit" class="btn btn-secondary w-100 mb-3">Add to cart</button>
+                                </form>
                             {% endif %}
                             {% if is_manager or is_admin %}
                                 <button type="submit"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
