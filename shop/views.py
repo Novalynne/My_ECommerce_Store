@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from accounts.models import Profile
-from products.models import Product, ProductStock
+from products.models import Product, ProductStock , Size
 from .models import Cart
 from django.http import JsonResponse
 from django.contrib import messages
@@ -12,74 +12,6 @@ from django.views.generic import ListView
 from pages.forms import SearchForm
 
 # Create your views here.
-'''
-
-from .cart import Cart
-def cart_summary(request):
-    # Get the cart
-    cart = Cart(request)
-    cart_products = cart.get_prods
-    quantities = cart.get_quants
-    totals = cart.cart_total()
-    return render(request, "cart_summary.html",
-                  {"cart_products": cart_products, "quantities": quantities, "totals": totals})
-
-
-def cart_add(request):
-    # Get the cart
-    cart = Cart(request)
-    # test for POST
-    if request.POST.get('action') == 'post':
-        # Get stuff
-        product_id = int(request.POST.get('product_id'))
-        product_qty = int(request.POST.get('product_qty'))
-
-        # lookup product in DB
-        product = get_object_or_404(Product, id=product_id)
-
-        # Save to session
-        cart.add(product=product, quantity=product_qty)
-
-        # Get Cart Quantity
-        cart_quantity = cart.__len__()
-
-        # Return resonse
-        # response = JsonResponse({'Product Name: ': product.name})
-        response = JsonResponse({'qty': cart_quantity})
-        messages.success(request, ("Product Added To Cart..."))
-        return response
-
-
-def cart_delete(request):
-    cart = Cart(request)
-    if request.POST.get('action') == 'post':
-        # Get stuff
-        product_id = int(request.POST.get('product_id'))
-        # Call delete Function in Cart
-        cart.delete(product=product_id)
-
-        response = JsonResponse({'product': product_id})
-        # return redirect('cart_summary')
-        messages.success(request, ("Item Deleted From Shopping Cart..."))
-        return response
-
-
-def cart_update(request):
-    cart = Cart(request)
-    if request.POST.get('action') == 'post':
-        # Get stuff
-        product_id = int(request.POST.get('product_id'))
-        product_qty = int(request.POST.get('product_qty'))
-
-        cart.update(product=product_id, quantity=product_qty)
-
-        response = JsonResponse({'qty': product_qty})
-        # return redirect('cart_summary')
-        messages.success(request, ("Your Cart Has Been Updated..."))
-        return response
-
-
-from django.shortcuts import render'''
 
 class cart_summary(ListView):
     model = Cart
@@ -114,17 +46,28 @@ def add_to_cart(request):
             if not created:
                 cart_item.quantity += quantity
                 cart_item.save()
-            # Aggiorna lo stock
-            stock.stock -= quantity
-            stock.save()
             messages.success(request, "Prodotto aggiunto al carrello!")
             return redirect("product", pk=product_id)
         else:
             messages.error(request, "Dati non validi.")
             return redirect(request.META.get("HTTP_REFERER", "/"))
     return redirect("homepage")
+
 def remove_from_cart(request):
-    pass
+    if request.method == "POST":
+        product_id = request.POST.get("product_id")
+        size_name = request.POST.get("size_name")
+        profile = Profile.objects.get(user=request.user)
+        product = get_object_or_404(Product, pk=product_id)
+        size = get_object_or_404(Size, name=size_name)
+        cart_item = Cart.objects.filter(user=profile, product=product, size=size).first()
+        if cart_item:
+            cart_item.delete()
+            messages.success(request, "Prodotto rimosso dal carrello.")
+        else:
+            messages.error(request, "Prodotto non trovato nel carrello.")
+            return redirect("cart_summary")
+    return redirect("cart_summary")
 def update_cart(request):
     pass
 

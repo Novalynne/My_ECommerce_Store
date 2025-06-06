@@ -77,13 +77,5 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart item {self.pk} for user {self.user}"
 
-    @staticmethod
-    def get_cart_for_user(user):
-        return Cart.objects.filter(user=user)
 
-    def user_cart_url(self):
-        return reverse("cart", kwargs={"pk": self.pk}) #TODO: add urls.py
-
-    # TODO: Add product to cart
-    # TODO: Remove product from cart
     # TODO: Update quantity of product in cart

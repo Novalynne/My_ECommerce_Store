@@ -13,7 +13,7 @@
         {% for product in products %}
             <div class="product-space">
                 <h3>{{ product.name }}</h3>
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150" height="250">
                 <div class="price-form-row mt-3">
                     <p><strong>€{{ product.price }}</strong></p>
                     <form action="#" method="post">
