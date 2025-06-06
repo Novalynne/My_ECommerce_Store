@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-sm">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt=""/>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">{{ product.name }}</h3>
+                        <p class="card-text text-muted">{{ product.description }}</p>
+                        <h4 class="text-success mb-4">€ {{ product.price }}</h4>
+                        <div class="d-flex justify-content-center gap-3 p-3">
+                            {% if is_client %}
+                                <button type="submit"><i class="fa fa-heart"></i></button>
+                                <button class="btn btn-secondary w-100 mb-3">Add to cart</button>
+                            {% endif %}
+                            {% if is_manager or is_admin %}
+                                <button type="submit"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
