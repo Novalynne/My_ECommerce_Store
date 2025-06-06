@@ -25,7 +25,16 @@
                         <h4 class="text-success mb-4">€ {{ product.price }}</h4>
                         <div class="d-flex justify-content-center gap-3 p-3">
                             {% if is_client %}
-                                <button type="submit"><i class="fa fa-heart"></i></button>
+                                <form method="post" action="{% url 'toggle_wishlist' product.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
+                                        {% if product in favorites %}
+                                            <i class="fa-solid fa-heart"></i>
+                                        {% else %}
+                                            <i class="fa-regular fa-heart"></i>
+                                        {% endif %}
+                                    </button>
+                                </form>
                                 <form method="post" action="{% url 'add_to_cart' %}">
                                     {% csrf_token %}
                                     {{ form.as_p }}

@@ -35,7 +35,7 @@
                 </form> <!-- TODO: Search Form -->
 
                 {% if is_client %}
-                    <a href="#" class="btn btn-outline-light me-2">
+                    <a href="{% url 'wishlist' %}" class="btn btn-outline-light me-2">
                         <i class="fa fa-heart"></i> Wishlist
                     </a>
                     <a href="{% url 'cart_summary' %}" class="btn btn-outline-light me-2">

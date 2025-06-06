@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Product, ProductStock, Size
 from shop.forms import AddToCartForm
+from accounts.models import Profile
 
 # Create your views here.
 
@@ -11,7 +12,10 @@ def product(request,pk):
     available_sizes = [ps.size for ps in size]
     form.fields['size'].queryset = Size.objects.filter(pk__in=[size.pk for size in available_sizes])
     user = request.user
+    profile = Profile.objects.get(user=user)
+    favorites = profile.favourites.all()
     context = {
+        'favorites': favorites,
         'product': product,
         'sizes': size,
         'form': form,

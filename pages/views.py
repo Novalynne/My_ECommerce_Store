@@ -1,5 +1,7 @@
 from django.shortcuts import render,  redirect, get_object_or_404
 from django.views.generic.list import ListView
+
+from accounts.models import Profile
 from products.models import Product, Category, Size, ProductStock
 from pages.forms import SearchForm
 
@@ -50,6 +52,9 @@ class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        profile = Profile.objects.get(user=user)
+        favourite = profile.favourites.all()
+        context['favourites'] = favourite
         context['search_form'] = SearchForm(self.request.GET)
         context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
         context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()

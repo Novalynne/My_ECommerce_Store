@@ -16,16 +16,25 @@
                 <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150" height="250">
                 <div class="price-form-row mt-3">
                     <p><strong>€{{ product.price }}</strong></p>
-                    <form action="#" method="post">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        {% if is_client %}
-                            <button type="submit"><i class="fa fa-heart"></i></button>
-                        {% endif %}
-                        {% if is_manager or is_admin %}
+                    {% if is_client %}
+                        <form method="post" action="{% url 'toggle_wishlist' product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
+                                {% if product in favourites %}
+                                    <i class="fa-solid fa-heart"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-heart"></i>
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if is_manager or is_admin %}
+                        <form action="#" method="post">
+                            {% csrf_token %}
+                            {{ form|crispy }}
                             <button type="submit"><i class="fa-solid fa-pen-to-square"></i></button>
-                        {% endif %}
-                    </form>
+                        </form>
+                    {% endif %}
                 </div>
                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent mt-3">
                     <div class="text-center">

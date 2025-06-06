@@ -71,3 +71,29 @@ def remove_from_cart(request):
 def update_cart(request):
     pass
 
+class wishlist(ListView):
+    model = Product
+    template_name = 'wishlist.html'
+    paginate_by = 10
+    context_object_name = 'wishlist_items'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile = Profile.objects.get(user=user)
+        wishlist = profile.favourites.all()
+        context['wishlist_items'] = wishlist
+        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
+        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
+        context['is_admin'] = user.is_authenticated and user.is_superuser
+        return context
+
+def toggle_wishlist(request, product_id):
+    user = request.user
+    profile = Profile.objects.get(user=user)
+    product = get_object_or_404(Product, pk=product_id)
+    if product not in profile.favourites.all():
+        profile.favourites.add(product)
+    else:
+        profile.favourites.remove(product)
+    return redirect(request.META.get('HTTP_REFERER', 'homepage'))
