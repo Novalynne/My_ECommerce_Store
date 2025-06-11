@@ -8,6 +8,15 @@
 
 {% block title %}Home Page{% endblock title %}
 
+{% block searchbar %}
+    <form method="get" novalidate action="{% url 'homepage' %}" class="gap-3 d-flex align-items-center">
+        {{ search_form.as_p }}
+        <button type="submit" class="btn btn-outline-light me-2"><i
+                class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form> <!-- TODO: Search Form -->
+{% endblock %}
+
 {% block content %}
     <div class="product-grid">
         {% for product in products %}

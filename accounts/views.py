@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, logout
-from .forms import CustomUserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth import login, logout, update_session_auth_hash
+from .forms import CustomUserCreationForm, EditProfileForm
 from django.contrib.auth.models import Group
 from django.views.generic import ListView
 from .models import Profile
@@ -50,4 +50,43 @@ class profile(ListView):
         return context
 
 def edit_profile_view(request):
-    pass
+    user = request.user
+    if request.method == "POST":
+        if 'save_profile' in request.POST:
+            profile_form = EditProfileForm(request.POST, instance=user, user=user)
+            password_form = PasswordChangeForm(user)
+            if profile_form.is_valid():
+                profile_form.save(user)
+                return redirect('profile')
+        elif 'change_password' in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            profile_form = EditProfileForm(instance=user, user=user)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                return redirect('profile')
+    else:
+        profile_form = EditProfileForm(instance=request.user, user=request.user)
+        password_form = PasswordChangeForm(request.user)
+    return render(request, 'edit_profile.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
+        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
+        'is_admin': user.is_authenticated and user.is_superuser,
+    })
+
+def delete_profile_view(request):
+    if request.method == "POST":
+        if 'confirm_delete' in request.POST:
+            user = request.user
+            user.delete()
+            logout(request)
+            return redirect('frontpage')
+        else:
+            return redirect('profile')
+    return render(request, 'delete_profile.html', {
+        'is_client': request.user.is_authenticated and request.user.groups.filter(name='client').exists(),
+        'is_manager': request.user.is_authenticated and request.user.groups.filter(name='manager').exists(),
+        'is_admin': request.user.is_authenticated and request.user.is_superuser,
+    })

@@ -1,20 +1,21 @@
-{% load static %}
 {% extends 'base.html' %}
+{% load static %}
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'account.css' %}">
 {% endblock css %}
 
 {% block content %}
-    <div class="container">
+    <div class="account-container">
         <h1>Account Details</h1>
         <div class="account-details">
             <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <p><strong>Name:</strong> {{ user.first_name }}</p>
+            <p><strong>Surname:</strong> {{ user.last_name }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Phone:</strong> {{ user.profile.phone }}</p>
+            <p><strong>Phone:</strong> {{ user.profile.phone_number }}</p>
             <p><strong>Address:</strong> {{ user.profile.address }}</p>
         </div>
-        <a href="{% url 'edit_account' %}" class="btn btn-primary">Edit Account</a>
+        <a href="{% url 'edit_profile' %}" class="btn btn-secondary">Edit Account</a>
     </div>
 {% endblock content %}

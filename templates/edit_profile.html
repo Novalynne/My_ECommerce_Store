@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'login.css' %}">
+{%endblock %}
+
+{% block title %}Edit Profile{% endblock title %}
+
+{% block content %}
+    <div class="edit-profile-container gap-3">
+        <div class="d-flex gap-5">
+            <h1>Edit Profile</h1>
+            <form method="post" action="{% url 'delete_profile' %}" onsubmit="return confirmDelete();">
+                {% csrf_token %}
+                <button type="submit" name="confirm_delete" class="btn btn-danger text-end">Delete Account</button>
+            </form>
+            <script>
+                function confirmDelete() {
+                    return confirm("Are you sure you want to delete your account? This action is irreversible.");
+                }
+            </script>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ profile_form | crispy }}
+            <button type="submit" name="save_profile" class="btn btn-primary mt-4">Save</button>
+        </form>
+
+        <hr>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ password_form| crispy }}
+            <button type="submit" name="change_password" class="btn btn-warning mt-3">Change Password</button>
+        </form>
+    </div>
+{% endblock content %}

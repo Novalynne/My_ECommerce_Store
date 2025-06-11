@@ -14,3 +14,10 @@ main {
 footer {
     flex-shrink: 0;
 }
+
+.mainblock {
+  display: flex;
+  justify-content: center; /* centra orizzontalmente */
+  align-items: center;     /* centra verticalmente */
+  height: 100vh;           /* altezza viewport */
+}

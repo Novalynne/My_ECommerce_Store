@@ -63,9 +63,7 @@ def remove_from_cart(request):
         cart_item = Cart.objects.filter(user=profile, product=product, size=size).first()
         if cart_item:
             cart_item.delete()
-            messages.success(request, "Prodotto rimosso dal carrello.")
         else:
-            messages.error(request, "Prodotto non trovato nel carrello.")
             return redirect("cart_summary")
     return redirect("cart_summary")
 def update_cart(request):

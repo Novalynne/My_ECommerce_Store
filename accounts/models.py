@@ -9,7 +9,7 @@ from products.models import Product
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=255, blank=False)
-    phone_number = models.CharField(max_length=20, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True, unique=True, null=True)
     favourites = models.ManyToManyField(Product, blank=True)
 
     def __str__(self):
