@@ -12,15 +12,7 @@
     <div class="edit-profile-container gap-3">
         <div class="d-flex gap-5">
             <h1>Edit Profile</h1>
-            <form method="post" action="{% url 'delete_profile' %}" onsubmit="return confirmDelete();">
-                {% csrf_token %}
-                <button type="submit" name="confirm_delete" class="btn btn-danger text-end">Delete Account</button>
-            </form>
-            <script>
-                function confirmDelete() {
-                    return confirm("Are you sure you want to delete your account? This action is irreversible.");
-                }
-            </script>
+            <button type="button" class="btn btn-danger text-end" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete Account</button>
         </div>
         <form method="post">
             {% csrf_token %}
@@ -36,4 +28,25 @@
             <button type="submit" name="change_password" class="btn btn-warning mt-3">Change Password</button>
         </form>
     </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm account delete</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete your account? This action is irreversible.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Exit</button>
+                    <form method="post" action="{% url 'delete_profile' %}">
+                        {% csrf_token %}
+                        <button type="submit" name="confirm_delete" class="btn btn-danger">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
+
