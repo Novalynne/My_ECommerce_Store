@@ -3,6 +3,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
 from .forms import CustomUserCreationForm
 from django.contrib.auth.models import Group
+from django.views.generic import ListView
+from .models import Profile
 
 def register_view(request):
     if request.method == "POST":
@@ -32,3 +34,20 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('frontpage')
+
+class profile(ListView):
+    model = Profile
+    template_name = 'account_details.html'
+    context_object_name = 'profile'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile = Profile.objects.get(user=user)
+        context['profile'] = profile
+        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
+        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
+        return context
+
+def edit_profile_view(request):
+    pass
