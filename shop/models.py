@@ -72,10 +72,7 @@ class Cart(models.Model):
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
-        unique_together = ("user", "product")
+        unique_together = ("user", "product", "size")
 
     def __str__(self):
         return f"Cart item {self.pk} for user {self.user}"
-
-
-    # TODO: Update quantity of product in cart

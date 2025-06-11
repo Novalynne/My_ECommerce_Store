@@ -18,40 +18,51 @@
 {% endblock %}
 
 {% block content %}
-    <div class="product-grid">
-        {% for product in products %}
-            <div class="product-space">
-                <h3>{{ product.name }}</h3>
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150" height="250">
-                <div class="price-form-row mt-3">
-                    <p><strong>€{{ product.price }}</strong></p>
-                    {% if is_client %}
-                        <form method="post" action="{% url 'toggle_wishlist' product.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
-                                {% if product in favourites %}
-                                    <i class="fa-solid fa-heart"></i>
-                                {% else %}
-                                    <i class="fa-regular fa-heart"></i>
-                                {% endif %}
-                            </button>
-                        </form>
-                    {% endif %}
-                    {% if is_manager or is_admin %}
-                        <form action="#" method="post">
-                            {% csrf_token %}
-                            {{ form|crispy }}
-                            <button type="submit"><i class="fa-solid fa-pen-to-square"></i></button>
-                        </form>
-                    {% endif %}
-                </div>
-                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent mt-3">
-                    <div class="text-center">
-                        <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View Product</a>
+    <div class="container my-5">
+        <div class="row g-4">
+            {% for product in products %}
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card product-card">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body text-center">
+                            <h3>{{ product.name }}</h3>
+                            {% if product.is_sale %}
+                                <div class="badge bg-dark text-white">-{{ product.discount_percentage }}%</div>
+                                <strike>€{{ product.price }}</strike>
+                                <span class="text-danger"><strong>€{{ product.sale_price }}</strong></span>
+                            {% else %}
+                                <span><strong>€{{ product.price }}</strong></span>
+                            {% endif %}
+                            {% if is_client %}
+                                <form method="post" action="{% url 'toggle_wishlist' product.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
+                                        {% if product in favourites %}
+                                            <i class="fa-solid fa-heart"></i>
+                                        {% else %}
+                                            <i class="fa-regular fa-heart"></i>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if is_manager or is_admin %}
+                                <form action="#" method="post">
+                                    {% csrf_token %}
+                                    {{ form|crispy }}
+                                    <button type="submit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent mt-3">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View
+                                    Product</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}

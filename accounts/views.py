@@ -3,7 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import login, logout, update_session_auth_hash
 from .forms import CustomUserCreationForm, EditProfileForm
 from django.contrib.auth.models import Group
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from .models import Profile
 
 def register_view(request):
@@ -35,10 +35,13 @@ def logout_view(request):
     logout(request)
     return redirect('frontpage')
 
-class profile(ListView):
+class profile(DetailView):
     model = Profile
     template_name = 'account_details.html'
     context_object_name = 'profile'
+
+    def get_object(self, queryset=None):
+        return Profile.objects.get(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -47,6 +50,7 @@ class profile(ListView):
         context['profile'] = profile
         context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
         context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
+        context['is_admin'] = user.is_authenticated and user.is_superuser
         return context
 
 def edit_profile_view(request):

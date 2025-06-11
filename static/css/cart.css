@@ -6,3 +6,7 @@
   align-items: center;
   text-align: center;
 }
+
+.cart-body{
+  gap: 10px;
+}

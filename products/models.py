@@ -38,6 +38,8 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.01'))],decimal_places=2)
     categories = models.ManyToManyField(Category, blank=True)
     image = CloudinaryField('image', blank=True, null=True, default='placeholder')
+    is_sale = models.BooleanField(default=False)
+    sale_price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.01'))],decimal_places=2)
 
     class Meta:
         db_table = 'products'
@@ -45,6 +47,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def discount_percentage(self):
+        if self.is_sale and self.price and self.sale_price:
+            return round((self.price - self.sale_price) / self.price * 100)
+        return 0
 
     def get_absolute_url(self):
         return reverse("product_detail", kwargs={"pk": self.pk}) #TODO: add urls.py
