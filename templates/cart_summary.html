@@ -5,6 +5,8 @@
     <link rel="stylesheet" href="{% static 'cart.css' %}">
 {% endblock css %}
 
+{% block title %}Cart{% endblock title %}
+
 {% block content %}
     {% for item in cart_products %}
         <div class="mb-4 cart-container">

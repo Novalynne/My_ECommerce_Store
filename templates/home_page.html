@@ -25,6 +25,8 @@
                     <div class="card product-card">
                         <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                         <div class="card-body text-center">
+                        
+                        
                             <h3>{{ product.name }}</h3>
                             {% if product.is_sale %}
                                 <div class="badge bg-dark text-white">-{{ product.discount_percentage }}%</div>
@@ -33,6 +35,8 @@
                             {% else %}
                                 <span><strong>€{{ product.price }}</strong></span>
                             {% endif %}
+                        
+                        
                             {% if is_client %}
                                 <form method="post" action="{% url 'toggle_wishlist' product.id %}">
                                     {% csrf_token %}
@@ -45,6 +49,8 @@
                                     </button>
                                 </form>
                             {% endif %}
+                        
+                        
                             {% if is_manager or is_admin %}
                                 <form action="#" method="post">
                                     {% csrf_token %}
@@ -53,12 +59,16 @@
                                 </form>
                             {% endif %}
                         </div>
+                    
+                    
                         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent mt-3">
                             <div class="text-center">
                                 <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View
                                     Product</a>
                             </div>
                         </div>
+                    
+                    
                     </div>
                 </div>
             {% endfor %}

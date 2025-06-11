@@ -17,8 +17,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("product_category", kwargs={"pk": self.pk}) #TODO: add urls.py
 
 class Size(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
@@ -39,7 +37,7 @@ class Product(models.Model):
     categories = models.ManyToManyField(Category, blank=True)
     image = CloudinaryField('image', blank=True, null=True, default='placeholder')
     is_sale = models.BooleanField(default=False)
-    sale_price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.01'))],decimal_places=2)
+    sale_price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.01'))],decimal_places=2, blank=True, null=True)
 
     class Meta:
         db_table = 'products'
@@ -54,14 +52,6 @@ class Product(models.Model):
             return round((self.price - self.sale_price) / self.price * 100)
         return 0
 
-    def get_absolute_url(self):
-        return reverse("product_detail", kwargs={"pk": self.pk}) #TODO: add urls.py
-
-    def product_delete(self):
-        return reverse("product_delete", kwargs={"pk": self.pk}) #TODO: add urls.py
-
-    def product_modify(self):
-        return reverse("product_modify", kwargs={"pk": self.pk}) #TODO: add urls.py
 
 
 class ProductStock(models.Model):
