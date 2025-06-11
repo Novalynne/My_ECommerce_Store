@@ -22,19 +22,19 @@ class CustomUserCreationForm(UserCreationForm):
             raise forms.ValidationError("The phone number must not contain letters.")
         if len(phone) != 10:
             raise forms.ValidationError("The phone number must be 10 cifre long.")
-        if Profile.objects.filter(phone_number=phone).exclude(user=self.instance).exists():
+        if Profile.objects.filter(phone_number=phone).exists():
             raise forms.ValidationError("This phone number is already in use.")
         return phone
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        if User.objects.filter(email=email).exclude(id=self.instance.id).exists():
+        if User.objects.filter(email=email).exists():
             raise forms.ValidationError("This email is already in use.")
         return email
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
-        if User.objects.filter(username=username).exclude(id=self.instance.id).exists():
+        if User.objects.filter(username=username).exists():
             raise forms.ValidationError("This username is already taken.")
         return username
 
