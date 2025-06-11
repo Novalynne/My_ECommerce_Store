@@ -15,9 +15,14 @@
                     <div class="card-header">
                         {{ item.product.name }} - {{ item.size }} - ${{ item.product.price }}
                     </div>
-                    <div class="card-body">
-                        Quantity: {{ item.quantity }}<br/>
-                    </div>
+                    <form method="post" action="{% url 'update_cart' %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                        <input type="hidden" name="size_name" value="{{ item.size.name }}">
+                        <button type="submit" name="action" value="decrease" class="btn btn-secondary">-</button>
+                        {{ item.quantity }}
+                        <button type="submit" name="action" value="increase" class="btn btn-secondary">+</button>
+                    </form>
                     <form method="post" action="{% url 'remove_from_cart' %}">
                         {% csrf_token %}
                         <input type="hidden" name="product_id" value="{{ item.product.id }}">

@@ -69,7 +69,27 @@ def remove_from_cart(request):
             return redirect("cart_summary")
     return redirect("cart_summary")
 def update_cart(request):
-    pass
+    if request.method == "POST":
+        product_id = request.POST.get("product_id")
+        size_name = request.POST.get("size_name")
+        action = request.POST.get("action")
+        profile = Profile.objects.get(user=request.user)
+        product = get_object_or_404(Product, pk=product_id)
+        size = get_object_or_404(Size, name=size_name)
+        cart_item = Cart.objects.filter(user=profile, product=product, size=size).first()
+        if cart_item:
+            if action == "increase":
+                stock = ProductStock.objects.get(product=product, size=size)
+                if cart_item.quantity < stock.stock:
+                    cart_item.quantity += 1
+                    cart_item.save()
+            elif action == "decrease":
+                if cart_item.quantity > 1:
+                    cart_item.quantity -= 1
+                    cart_item.save()
+                else:
+                    cart_item.delete()
+    return redirect("cart_summary")
 
 class wishlist(ListView):
     model = Product
