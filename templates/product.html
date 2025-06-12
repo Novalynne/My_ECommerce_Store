@@ -21,11 +21,17 @@
                     <img src="{{ product.image.url }}" class="card-img-top" alt=""/>
                     <div class="card-body text-center">
                         <h3 class="card-title">{{ product.name }}</h3>
-                        <ul class="list-unstyled">
+                    
+                        {% if sizes %}
+                            <ul class="list-unstyled">
                             {% for product in sizes %}
-                                <li>{{ product.size.name }} (Disponibili: {{ product.stock }})</li>
+                                <li>{{ product.size.name }} (Available: {{ product.stock }})</li>
                             {% endfor %}
-                        </ul>
+                            </ul>
+                        {% else %}
+                            <span class="text-danger"><strong>No sizes available</strong></span>
+                        {% endif %}
+                    
                         <p class="card-text text-muted">{{ product.description }}</p>
                         {% if product.is_sale %}
                             <strike>€{{ product.price }}</strike>
@@ -33,6 +39,7 @@
                         {% else %}
                             <span><strong>€{{ product.price }}</strong></span>
                         {% endif %}
+                    
                         <div class="d-flex justify-content-center gap-3 p-3">
                             {% if is_client %}
                                 <form method="post" action="{% url 'toggle_wishlist' product.id %}">
@@ -52,6 +59,7 @@
                                     <button type="submit" class="btn btn-secondary w-100 mb-3">Add to cart</button>
                                 </form>
                             {% endif %}
+                        
                             {% if is_manager or is_admin %}
                                 <button type="submit"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                             {% endif %}
