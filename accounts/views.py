@@ -87,10 +87,5 @@ def delete_profile_view(request):
             user.delete()
             logout(request)
             return redirect('frontpage')
-        else:
-            return redirect('profile')
-    return render(request, 'delete_profile.html', {
-        'is_client': request.user.is_authenticated and request.user.groups.filter(name='client').exists(),
-        'is_manager': request.user.is_authenticated and request.user.groups.filter(name='manager').exists(),
-        'is_admin': request.user.is_authenticated and request.user.is_superuser,
-    })
+    return redirect('edit_profile')
+

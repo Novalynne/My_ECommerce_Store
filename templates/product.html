@@ -61,7 +61,11 @@
                             {% endif %}
                         
                             {% if is_manager or is_admin %}
-                                <button type="submit"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                                <div>
+                                    <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
