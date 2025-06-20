@@ -1,7 +1,10 @@
+from msilib.schema import ListView
+
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 
 from .forms import AddToShopForm, SizeStockFormSet, ProductForm
-from .models import Product, ProductStock, Size
+from .models import Product, ProductStock, Size, Category
 from shop.forms import AddToCartForm
 from accounts.models import Profile
 
@@ -113,4 +116,41 @@ def delete_product(request, pk):
         return redirect("homepage")
     return redirect("edit_product", pk=pk)
 
+def manage_categories(request):
+    user = request.user
+    categories = Category.objects.all()
 
+    if request.method == "POST":
+        if "add_category" in request.POST:
+            name = request.POST.get("name")
+            if name and not Category.objects.filter(name=name).exists():
+                Category.objects.create(name=name)
+            return redirect("manage_categories")
+
+        if "edit_category" in request.POST:
+            cat_name = request.POST.get("cat_name")
+            new_name = request.POST.get("new_name")
+            if cat_name and new_name and cat_name != new_name:
+                if not Category.objects.filter(name=new_name).exists():
+                    try:
+                        cat = Category.objects.get(name=cat_name)
+                        Category.objects.create(name=new_name)
+                        cat.delete()
+                    except Category.DoesNotExist:
+                        messages.error(request, "Original category not found.")
+                else:
+                    messages.error(request, "Category already exist.")
+            return redirect("manage_categories")
+
+        if "delete_category" in request.POST:
+            cat_name = request.POST.get("cat_name")
+            if cat_name:
+                Category.objects.filter(name=cat_name).delete()
+            return redirect("manage_categories")
+
+    return render(request, "category.html", {
+        "categories": categories,
+        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
+        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
+        'is_admin': user.is_authenticated and user.is_superuser,
+    })

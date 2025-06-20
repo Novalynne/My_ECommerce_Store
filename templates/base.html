@@ -47,12 +47,18 @@
                         <i class="fa-solid fa-plus"></i> Add Product
                     </a>
                     
-                    <a href="#" class="btn btn-outline-light me-2">
-                        <i class="fa-solid fa-plus"></i> Add Category
+                    <a href="{% url 'manage_categories' %}" class="btn btn-outline-light me-2">
+                        <i class="fa-solid fa-plus"></i> Category
                     </a>
                     
                     <a href="#" class="btn btn-outline-light me-2">
                         <i class="fa-solid fa-truck"></i> View All Orders
+                    </a>
+                {% endif %}
+            
+                {% if is_admin %}
+                    <a href="#" class="btn btn-outline-light me-2">
+                        <i class="fa-solid fa-users"></i> Managers
                     </a>
                 {% endif %}
             

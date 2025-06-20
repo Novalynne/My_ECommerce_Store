@@ -1,7 +1,5 @@
 from django.shortcuts import render, get_object_or_404, render
-from django.contrib import messages
 from django.shortcuts import redirect
-
 from accounts.models import Profile
 from products.models import Product, ProductStock , Size
 from .models import Cart
