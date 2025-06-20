@@ -57,7 +57,7 @@
                 {% endif %}
             
                 {% if is_admin %}
-                    <a href="#" class="btn btn-outline-light me-2">
+                    <a href="{% url 'manage_profiles' %}" class="btn btn-outline-light me-2">
                         <i class="fa-solid fa-users"></i> Managers
                     </a>
                 {% endif %}

@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import login, logout, update_session_auth_hash
 from .forms import CustomUserCreationForm, EditProfileForm
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.views.generic import ListView, DetailView
 from .models import Profile
 
@@ -88,4 +88,47 @@ def delete_profile_view(request):
             logout(request)
             return redirect('frontpage')
     return redirect('edit_profile')
+
+class ManageProfilesView(ListView):
+    model = Profile
+    template_name = 'managers.html'
+    context_object_name = 'profiles'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        query = self.request.GET.get('q')
+        base_clients = Profile.objects.filter(user__groups__name='client')
+        base_managers = Profile.objects.filter(user__groups__name='manager')
+        if query:
+            base_clients = base_clients.filter(user__username__icontains=query)
+            base_managers = base_managers.filter(user__username__icontains=query)
+
+        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
+        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
+        context['is_admin'] = user.is_authenticated and user.is_superuser
+        context['clients'] = base_clients
+        context['managers'] = base_managers
+        context['query'] = query
+        return context
+
+def promote_to_manager(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    client_group = Group.objects.get(name="client")
+    manager_group = Group.objects.get(name="manager")
+
+    user.groups.remove(client_group)
+    user.groups.add(manager_group)
+
+    return redirect("manage_profiles")
+
+def demote_to_client(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    client_group = Group.objects.get(name="client")
+    manager_group = Group.objects.get(name="manager")
+
+    user.groups.remove(manager_group)
+    user.groups.add(client_group)
+
+    return redirect("manage_profiles")
 

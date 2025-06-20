@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Manage Managers{% endblock title %}
+
+{% block content %}
+    
+    <h2>Manage Managers</h2>
+    
+    <form method="get" class="mb-4">
+        <input type="text" name="q" placeholder="Search per user" value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-outline-dark me-2">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form>
+    
+    <div >
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Clients</h3>
+                <ul>
+                    {% for profile in clients %}
+                        <li>
+                            {{ profile.user.username }}
+                            <form method="post" class="btn btn-outline-light me-2" action="{% url 'promote_to_manager' profile.user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-secondary btn btn-sm">Promote</button>
+                            </form>
+                        </li>
+                    {% empty %}
+                        <li>No clients found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        
+            <div class="col-md-6">
+                <h3>Managers</h3>
+                <ul>
+                    {% for profile in managers %}
+                        <li>
+                            {{ profile.user.username }}
+                            <form method="post" class="btn btn-outline-light me-2" action="{% url 'demote_to_client' profile.user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-secondary btn btn-sm">Demote</button>
+                            </form>
+                        </li>
+                    {% empty %}
+                        <li>No managers found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
