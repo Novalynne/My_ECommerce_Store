@@ -130,11 +130,15 @@ def manage_categories(request):
         if "edit_category" in request.POST:
             cat_name = request.POST.get("cat_name")
             new_name = request.POST.get("new_name")
+            products = Product.objects.filter(categories=cat_name)
             if cat_name and new_name and cat_name != new_name:
                 if not Category.objects.filter(name=new_name).exists():
                     try:
                         cat = Category.objects.get(name=cat_name)
                         Category.objects.create(name=new_name)
+                        for product in products:
+                            product.categories.remove(cat)
+                            product.categories.add(new_name)
                         cat.delete()
                     except Category.DoesNotExist:
                         messages.error(request, "Original category not found.")
