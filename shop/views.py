@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, render
 from django.shortcuts import redirect
 from accounts.models import Profile
 from products.models import Product, ProductStock , Size
-from .models import Cart
+from .models import Cart, Order
 from django.http import JsonResponse
 from django.contrib import messages
 from .forms import AddToCartForm
@@ -20,7 +20,17 @@ class cart_summary(ListView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         cart_products = Cart.objects.filter(user__user=user)
+
+        total = 0
+        for item in cart_products:
+            if item.product.is_sale:
+                price = item.product.sale_price
+            else:
+                price = item.product.price
+            total += price * item.quantity
+
         context['cart_products'] = cart_products
+        context['total'] = total
         context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
         context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
         context['is_admin'] = user.is_authenticated and user.is_superuser
@@ -115,3 +125,72 @@ def toggle_wishlist(request, product_id):
     else:
         profile.favourites.remove(product)
     return redirect(request.META.get('HTTP_REFERER', 'homepage'))
+
+from decimal import Decimal
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from .models import Cart, Order, OrderProduct, Profile
+
+def place_order(request):
+    user = request.user
+    profile = Profile.objects.get(user=user)
+    cart_items = Cart.objects.filter(user=profile)
+
+    if request.method == "POST":
+        if not cart_items.exists():
+            return redirect("cart_summary")
+
+        order = Order.objects.create(
+            user=profile,
+            address=profile.address,
+            total=Decimal('0.00'),
+            status_id= 1
+        )
+
+        order_products = []
+        for item in cart_items:
+            order_product = OrderProduct(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                size=item.size,
+                unit_price=item.product.price if not item.product.is_sale else item.product.sale_price
+            )
+            order_products.append(order_product)
+            product_stock = ProductStock.objects.get(product=item.product, size=item.size)
+            if product_stock.stock >= item.quantity:
+                product_stock.stock -= item.quantity
+                product_stock.save()
+                if product_stock.stock <= 0:
+                    product_stock.delete()
+                    return redirect("cart_summary")
+            else:
+                return redirect("cart_summary")
+
+        OrderProduct.objects.bulk_create(order_products)
+
+        total = sum(op.unit_price * op.quantity for op in order.products.all())
+        order.total = total
+        order.save()
+
+
+        cart_items.delete()
+
+        return redirect("order_summary")
+    return redirect("cart_summary")
+
+class order_summery(ListView):
+    model = Order
+    template_name = 'order_summary.html'
+    context_object_name = 'orders'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        orders = Order.objects.filter(user__user=user).order_by('-date')
+
+        context['orders'] = orders
+        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
+        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
+        context['is_admin'] = user.is_authenticated and user.is_superuser
+        return context
