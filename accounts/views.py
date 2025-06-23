@@ -116,19 +116,19 @@ def promote_to_manager(request, user_id):
     user = get_object_or_404(User, id=user_id)
     client_group = Group.objects.get(name="client")
     manager_group = Group.objects.get(name="manager")
-
-    user.groups.remove(client_group)
-    user.groups.add(manager_group)
-
-    return redirect("manage_profiles")
+    if request.method == "POST":
+        user.groups.remove(client_group)
+        user.groups.add(manager_group)
+        return redirect("manage_profiles")
+    return render(request, 'managers.html', {'user': user})
 
 def demote_to_client(request, user_id):
     user = get_object_or_404(User, id=user_id)
     client_group = Group.objects.get(name="client")
     manager_group = Group.objects.get(name="manager")
 
-    user.groups.remove(manager_group)
-    user.groups.add(client_group)
-
-    return redirect("manage_profiles")
-
+    if request.method == "POST":
+        user.groups.remove(manager_group)
+        user.groups.add(client_group)
+        return redirect("manage_profiles")
+    return render(request, 'managers.html', {'user': user})

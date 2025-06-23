@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment{% endblock title %}
+
+{% block content %}
+    <h2>Checkout - Payment</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <h3>Order Summary</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in cart_products %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.size.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>
+                    {% if item.product.is_sale %}
+                        {{ item.product.sale_price }}
+                    {% else %}
+                        {{ item.product.price }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p><strong>Total: {{ total }} €</strong></p>
+
+    <hr>
+
+    <h3>Payment Info</h3>
+    <!-- Fake form - fields are just for show -->
+    <form method="post" action="{% url 'place_order' %}">
+        {% csrf_token %}
+        <label for="card_number">Card Number:</label>
+        <input type="text" id="card_number" name="card_number" required><br><br>
+
+        <label for="expiry">Expiry Date:</label>
+        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required><br><br>
+
+        <label for="cvv">CVV:</label>
+        <input type="text" id="cvv" name="cvv" required><br><br>
+        
+        <input type="hidden" name="total" value="{{ total }}">
+        <button type="submit">Make Order</button>
+    </form>
+
+    <br>
+    <a href="{% url 'cart_summary' %}">
+        <button>Back to Cart</button>
+    </a>
+
+{% endblock %}

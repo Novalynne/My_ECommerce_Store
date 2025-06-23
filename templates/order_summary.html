@@ -15,23 +15,36 @@
                 <div class="ms-3">
                     <p class="text-success">{{ order.status }}</p>
                 </div>
-                <div class="ms-3">
+                <div class="ms-3 d-flex gap-3">
+                    {% if order.status.id == 1 %} <!-- status.id 1 is for 'IN THE MAKING' -->
+                        <div class="ms-3">
+                            <form method="post" action="{% url 'cancel_order' order.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Cancel Order</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                    {% if order.status.id == 2 %} <!-- status.id 2 is for 'DELIVERED' -->
+                        <h2>Reso</h2>
+                    {% endif %}
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                             data-bs-target="#orderDetails{{ order.id }}">
                         Details
                     </button>
                 </div>
-                <div class="collapse" id="orderDetails{{ order.id }}">
-                    <div class="card-body">
-                        <ul class="list-group">
-                            {% for item in order.products.all %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a>
-                                    - {{ item.size }} × {{ item.quantity }} - €{{ item.unit_price }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+            </div>
+            <div class="collapse" id="orderDetails{{ order.id }}">
+                <div>
+                    <ul class="list-group">
+                        {% for item in order.products.all %}
+                            <li class="list-group-item d-flex align-items-center gap-5">
+                                <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a>
+                                <span> Size: {{ item.size }}</span>
+                                <span> Quantity: {{ item.quantity }}</span>  
+                                <span> Price: €{{ item.unit_price }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
