@@ -37,9 +37,6 @@ class CartSummary(ListView):
         cart_products, total = self.get_cart_products_and_total()
         context['cart_products'] = cart_products
         context['total'] = total
-        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
-        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
-        context['is_admin'] = user.is_authenticated and user.is_superuser
         return context
 
     def post(self, request, *args, **kwargs):
@@ -52,9 +49,6 @@ class CartSummary(ListView):
         context = {
             'cart_products': cart_products,
             'total': total,
-            'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
-            'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
-            'is_admin': user.is_authenticated and user.is_superuser
         }
         return render(request, 'payment.html', context)
 
@@ -139,9 +133,6 @@ class wishlist(ListView):
         profile = Profile.objects.get(user=user)
         wishlist = profile.favourites.all()
         context['wishlist_items'] = wishlist
-        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
-        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
-        context['is_admin'] = user.is_authenticated and user.is_superuser
         return context
 
 def toggle_wishlist(request, product_id):
@@ -236,9 +227,6 @@ class OrderSummery(ListView):
         orders = Order.objects.filter(user__user=user).order_by('-date')
 
         context['orders'] = orders
-        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
-        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
-        context['is_admin'] = user.is_authenticated and user.is_superuser
         return context
 
 def cancel_order(request, order_id):

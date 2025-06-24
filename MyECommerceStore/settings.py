@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'static.context_processors.user_roles',  # Custom context processor for user roles
             ],
         },
     },
@@ -128,7 +129,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/css')]
-                    #os.path.join(BASE_DIR, 'static/javascript')] TODO: Add your JavaScript directory
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')         # Directory for images files, now that i save images in cloudinary this is not needed
 

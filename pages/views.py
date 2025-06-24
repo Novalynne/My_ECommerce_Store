@@ -56,9 +56,6 @@ class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
         favourite = profile.favourites.all()
         context['favourites'] = favourite
         context['search_form'] = SearchForm(self.request.GET)
-        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
-        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
-        context['is_admin'] = user.is_authenticated and user.is_superuser
         return context
 
 '''

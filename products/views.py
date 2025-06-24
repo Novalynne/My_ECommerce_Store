@@ -22,9 +22,6 @@ def product(request,pk):
         'product': product,
         'sizes': size,
         'form': form,
-        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
-        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
-        'is_admin': user.is_authenticated and user.is_superuser,
     }
     return render(request, 'product.html', context)
 
@@ -61,9 +58,6 @@ def add_to_shop(request):
         formset = SizeStockFormSet(initial=initial)
     return render(request, 'add_product_to_shop.html', {
         'form': form, 'formset': formset,
-        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
-        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
-        'is_admin': user.is_authenticated and user.is_superuser,
     })
 
 @transaction.atomic
@@ -103,9 +97,6 @@ def edit_product(request, pk):
         'form': form,
         'formset': formset,
         'product': product,
-        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
-        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
-        'is_admin': user.is_authenticated and user.is_superuser,
     })
 
 
@@ -154,7 +145,4 @@ def manage_categories(request):
 
     return render(request, "category.html", {
         "categories": categories,
-        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
-        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
-        'is_admin': user.is_authenticated and user.is_superuser,
     })

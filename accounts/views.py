@@ -48,9 +48,6 @@ class profile(DetailView):
         user = self.request.user
         profile = Profile.objects.get(user=user)
         context['profile'] = profile
-        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
-        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
-        context['is_admin'] = user.is_authenticated and user.is_superuser
         return context
 
 def edit_profile_view(request):
@@ -75,9 +72,6 @@ def edit_profile_view(request):
     return render(request, 'edit_profile.html', {
         'profile_form': profile_form,
         'password_form': password_form,
-        'is_client': user.is_authenticated and user.groups.filter(name='client').exists(),
-        'is_manager': user.is_authenticated and user.groups.filter(name='manager').exists(),
-        'is_admin': user.is_authenticated and user.is_superuser,
     })
 
 def delete_profile_view(request):
@@ -104,9 +98,6 @@ class ManageProfilesView(ListView):
             base_clients = base_clients.filter(user__username__icontains=query)
             base_managers = base_managers.filter(user__username__icontains=query)
 
-        context['is_client'] = user.is_authenticated and user.groups.filter(name='client').exists()
-        context['is_manager'] = user.is_authenticated and user.groups.filter(name='manager').exists()
-        context['is_admin'] = user.is_authenticated and user.is_superuser
         context['clients'] = base_clients
         context['managers'] = base_managers
         context['query'] = query
