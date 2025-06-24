@@ -1,6 +1,5 @@
 import random
 from django.shortcuts import render, get_object_or_404
-from django.shortcuts import redirect
 from products.models import Product, ProductStock , Size
 from .forms import AddToCartForm
 from django.views.generic import ListView, DetailView
@@ -8,10 +7,14 @@ from decimal import Decimal
 from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Cart, Order, OrderProduct, Profile
+from django.db import transaction
 
 # Create your views here.
 
-class cart_summary(ListView):
+# --- CART VIEWS ---
+# CartSummary, add_to_cart, remove_from_cart, update_cart
+
+class CartSummary(ListView):
     model = Cart
     template_name = 'cart_summary.html'
     paginate_by = 10
@@ -65,7 +68,7 @@ def add_to_cart(request):
             product = get_object_or_404(Product, pk=product_id)
             stock = get_object_or_404(ProductStock, product=product, size=size)
             if quantity > stock.stock:
-                messages.error(request, "Quantity of item not available.")
+                messages.warning(request, "Quantity of item not available.")
                 return redirect("product", pk=product_id)
             # Salva nel carrello
             profile = Profile.objects.get(user=request.user)
@@ -111,6 +114,8 @@ def update_cart(request):
                 if cart_item.quantity < stock.stock:
                     cart_item.quantity += 1
                     cart_item.save()
+                else:
+                    messages.warning(request, "Cannot increase quantity beyond available stock.")
             elif action == "decrease":
                 if cart_item.quantity > 1:
                     cart_item.quantity -= 1
@@ -118,6 +123,9 @@ def update_cart(request):
                 else:
                     cart_item.delete()
     return redirect("cart_summary")
+
+# --- WISHLIST VIEWS ---
+# wishlist, toggle_wishlist
 
 class wishlist(ListView):
     model = Product
@@ -140,11 +148,21 @@ def toggle_wishlist(request, product_id):
     user = request.user
     profile = Profile.objects.get(user=user)
     product = get_object_or_404(Product, pk=product_id)
-    if product not in profile.favourites.all():
-        profile.favourites.add(product)
-    else:
-        profile.favourites.remove(product)
+
+    if request.method == "POST":
+        if product not in profile.favourites.all():
+            profile.favourites.add(product)
+        else:
+            profile.favourites.remove(product)
+
+        # Redirect alla pagina precedente, con fallback alla homepage
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            return redirect(referer)
     return redirect('homepage')
+
+# --- ORDER VIEWS ---
+# place_order, order_summary, cancel_order
 
 def place_order(request):
     user = request.user
@@ -160,46 +178,54 @@ def place_order(request):
             print(f"Total: {total}, Money: {money}")
             return redirect("cart_summary")
 
-        order = Order.objects.create(
-            user=profile,
-            address=profile.address,
-            total=total,
-            status_id= 1
-        )
+        try:
+            with transaction.atomic():
+                order = Order.objects.create(
+                    user=profile,
+                    address=profile.address,
+                    total=total,
+                    status_id=1
+                )
 
-        order_products = []
-        for item in cart_items:
-            order_product = OrderProduct(
-                order=order,
-                product=item.product,
-                quantity=item.quantity,
-                size=item.size,
-                unit_price=item.product.price if not item.product.is_sale else item.product.sale_price
-            )
-            order_products.append(order_product)
-            product_stock_qs = ProductStock.objects.filter(product=item.product, size=item.size)
-            if not product_stock_qs.exists():
-                messages.warning(request, f"Not enough stock for {item.product.name} in size {item.size.name}.")
-                return redirect("cart_summary")
+                order_products = []
 
-            product_stock = product_stock_qs.first()
+                for item in cart_items:
+                    product_stock = ProductStock.objects.filter(product=item.product, size=item.size).first()
 
-            if product_stock.stock >= item.quantity:
-                product_stock.stock -= item.quantity
-                product_stock.save()
-                if product_stock.stock <= 0:
-                    product_stock.delete()
-                    return redirect("cart_summary")
-            else:
-                messages.error(request, f"Not enough stock for {item.product.name} in size {item.size.name}.")
-                return redirect("cart_summary")
+                    if not product_stock:
+                        raise ValueError(f"Not enough stock for {item.product.name} in size {item.size.name}.")
 
-        OrderProduct.objects.bulk_create(order_products)
-        cart_items.delete()
+                    if product_stock.stock < item.quantity:
+                        raise ValueError(f"Not enough stock for {item.product.name} in size {item.size.name}.")
+
+                    # Stock sufficiente, scala
+                    product_stock.stock -= item.quantity
+                    product_stock.save()
+                    if product_stock.stock <= 0:
+                        product_stock.delete()
+
+                    order_product = OrderProduct(
+                        order=order,
+                        product=item.product,
+                        quantity=item.quantity,
+                        size=item.size,
+                        unit_price=item.product.price if not item.product.is_sale else item.product.sale_price
+                    )
+                    order_products.append(order_product)
+
+                OrderProduct.objects.bulk_create(order_products)
+                cart_items.delete()
+
+        except ValueError as e:
+            messages.warning(request, str(e))
+            return redirect("cart_summary")
+
         return redirect("order_summary")
+
     return redirect("cart_summary")
 
-class order_summery(ListView):
+
+class OrderSummery(ListView):
     model = Order
     template_name = 'order_summary.html'
     context_object_name = 'orders'
@@ -219,11 +245,28 @@ def cancel_order(request, order_id):
     user = request.user
     order = get_object_or_404(Order, id=order_id, user__user=user)
 
-    if order.status.id == 1: # status.id 1 is for 'IN THE MAKING'
-        order.delete()
-    else:
-        messages.error(request, "Order isn't in the making.")
+    if order.status.id != 1:  # 1 = "IN THE MAKING" , it is just a double check it shoud never occour for the order to not be in the making
+        messages.warning(request, "Order isn't in the making.")
         return redirect("order_summary")
+
+    try:
+        with transaction.atomic():
+            order_products = OrderProduct.objects.filter(order=order)
+
+            for op in order_products:
+                product_stock, created = ProductStock.objects.get_or_create(
+                    product=op.product,
+                    size=op.size,
+                    defaults={"stock": 0}
+                )
+                product_stock.stock += op.quantity
+                product_stock.save()
+
+            order.delete()
+            messages.success(request, "Order successfully cancelled and stock restored.")
+    except Exception as e:
+        messages.warning(request, f"Error while cancelling the order: {str(e)}")
     return redirect("order_summary")
+
 
 
