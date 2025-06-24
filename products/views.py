@@ -1,12 +1,10 @@
-from msilib.schema import ListView
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-
 from .forms import AddToShopForm, SizeStockFormSet, ProductForm
 from .models import Product, ProductStock, Size, Category
 from shop.forms import AddToCartForm
 from accounts.models import Profile
+from django.db import transaction
 
 # Create your views here.
 
@@ -36,6 +34,7 @@ def category(request, foo):
 def category_summary(request):
     pass
 
+@transaction.atomic
 def add_to_shop(request):
     user = request.user
     sizes = Size.objects.all()
@@ -67,6 +66,7 @@ def add_to_shop(request):
         'is_admin': user.is_authenticated and user.is_superuser,
     })
 
+@transaction.atomic
 def edit_product(request, pk):
     user = request.user
     product = get_object_or_404(Product, pk=pk)
