@@ -11,4 +11,6 @@ urlpatterns = [
     path("cart/checkout/payment/success", views.place_order, name="place_order"),
     path("order/<int:order_id>/cancel/", views.cancel_order, name="cancel_order"),
     path("order/", views.OrderSummery.as_view(), name="order_summary"),
+    path("order/manage/", views.ManagerOrderList.as_view(), name="manage_orders"),
+    path("order/manage/changestatus/<int:order_id>/", views.order_change_status, name="change_order_status"),
 ]

@@ -21,12 +21,29 @@ reduced by using CSS frameworks like Bootstrap to style the store. Store manager
 second user group) will be able to manage products, categories, and orders.
 
 ## Features
-There are two types of users: customers and store managers. 
+This project is a complete e-commerce website that allows users to browse products, manage their accounts, and place orders. It includes functionalities for both customers and store managers, ensuring a comprehensive shopping experience.
 
-Customers can register, log in, add products to their cart, and place orders. They can also view their order history, manage their account details and view their favorite products.
+There are three types of users: customers, store managers and admin. 
 
-Store managers can log in, manage products (add, edit, delete), manage categories, and view all orders placed by customers.
+Customers can manage their accounts, manage their cart, and place orders. They can also view their order history and favorite products.
+Store managers can manage products, categories, and view all orders placed by customers.
+Admin is like a manager with the ability to make more managers, he can do everything a manager can plus manage users.
 
-Both users are able to search for products by name or category, and view product details.
+Here I'll go more into the details of the features and functionalities of the e-commerce store.
 
-## TODO: Add more details about the features and functionalities of the e-commerce store, such as payment methods, shipping options, etc.
+## Features Overview
+- **User Management**: Users can register, log in, and manage their profiles. Such as updating personal information and changing passwords.
+
+- **Product Management**: Store managers can add, edit, and delete products. They can also manage product categories, deleting or adding categories as needed. Every product has a stock quantity and a price/sale price that can be changed by the manager at all times.
+
+- **Product Browsing**: Customers and Managers can browse products by category, search for specific products, and view product details. Products are displayed with their images, descriptions, prices, and stock availability.
+
+- **Shopping Cart**: Customers can add products to their shopping cart, view the cart, and update quantities or remove items. In the cart you can then check out and place an order.
+
+- **Wishlist**: Customers can add products to their wishlist for future reference. They can view and manage their wishlist items.
+
+- **Payment Processing**: Customers can place orders and make payments. The payment process is for the sake of this project just a form, it doesn't do any bank transactions. To simulate a payment I made it so everytime the client tries to pay (clicking the "Make Order" button) a random number will be generated and checked with the total of the order, if the money generated is sufficient the order will go through, otherwise the operation will be cancelled and an error message will pop up in the cart view. NOTE: This button also checks for the stock of each item and quantity in the order ensuring that at the time of the order there is enough stock to cover the order.
+
+- **Order Management**: Customers can view their order history, and Managers can view all orders placed by customers. Orders have 4 different state "in the making", "shipped", "arrived", "returned". While the order is in the making state the Customer can cancel the order. The Manager can change the state of the order from "in the making" to "shipped". A shipped order automatically changes to "arrived" after 3 days from its shipping date, and the Customer can return it for 7 days after it has arrived.
+
+- **Admin Features**: Admin can promote users to store managers, allowing them to manage products and orders. He can also demote managers back to customers. He can also do anything a manager can do, such as managing products, categories, and orders.

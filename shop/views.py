@@ -1,13 +1,14 @@
 import random
 from django.shortcuts import render, get_object_or_404
-from products.models import Product, ProductStock , Size
+from products.models import Product, ProductStock, Size
 from .forms import AddToCartForm
 from django.views.generic import ListView, DetailView
 from decimal import Decimal
 from django.shortcuts import redirect
 from django.contrib import messages
-from .models import Cart, Order, OrderProduct, Profile
+from .models import Cart, Order, OrderProduct, Profile, Status
 from django.db import transaction
+from django.utils import timezone
 
 # Create your views here.
 
@@ -153,7 +154,7 @@ def toggle_wishlist(request, product_id):
     return redirect('homepage')
 
 # --- ORDER VIEWS ---
-# place_order, order_summary, cancel_order
+# place_order, 0rderSummary, cancel_order, order_change_status, ManagerOrderList
 
 def place_order(request):
     user = request.user
@@ -226,6 +227,9 @@ class OrderSummery(ListView):
         user = self.request.user
         orders = Order.objects.filter(user__user=user).order_by('-date')
 
+        for order in orders:
+            order.update_status()
+
         context['orders'] = orders
         return context
 
@@ -256,5 +260,31 @@ def cancel_order(request, order_id):
         messages.warning(request, f"Error while cancelling the order: {str(e)}")
     return redirect("order_summary")
 
+def order_change_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
 
+    if request.method == "POST":
+        if order.status.name == 'IN THE MAKING':
+            order.status = Status.objects.get(name='SHIPPED')
+            order.shipped_at = timezone.now()
+            order.save()
+            messages.success(request, "Order #"+ str(order_id) +" status updated to SHIPPED.")
+        else:
+            messages.warning(request, "Order status cannot be changed.")
+        return redirect("manage_orders")
+    return redirect("manage_orders")
 
+class ManagerOrderList(ListView):
+    model = Order
+    template_name = 'manager_order_list.html'
+    context_object_name = 'orders'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        orders = Order.objects.all().order_by('-date')
+
+        for order in orders:
+            order.update_status()
+
+        context['orders'] = orders
+        return context

@@ -1,9 +1,10 @@
+from datetime import timezone, timedelta
 from django.db import models
 from accounts.models import Profile
 from products.models import Product, Size
 from _decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.urls import reverse
+from django.utils import timezone
 
 # Create your models here.
 
@@ -24,10 +25,18 @@ class Order(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     address = models.CharField(max_length=255)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name="status")
-    # TODO: add status field (e.g., pending, completed, cancelled), and shipping cost if applicable
+    shipped_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Order #{self.id} by {self.user}"
+
+    def update_status(self):
+        if self.status.name == 'SHIPPED' and self.shipped_at:
+            shipped_duration = timezone.now() - self.shipped_at
+            if shipped_duration > timedelta(minutes=5):
+                arrived_status = Status.objects.get(name='ARRIVED')
+                self.status = arrived_status
+                self.save()
 
 
 

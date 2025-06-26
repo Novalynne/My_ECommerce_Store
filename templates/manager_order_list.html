@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Order{% endblock title %}
+{% block title %}Manager Order List{% endblock %}
 
 {% block content %}
     {% if messages %}
@@ -18,6 +18,7 @@
                 <div class="ms-3">
                     <p>Total: €{{ order.total }}</p>
                     <p>Address: {{ order.address }}</p>
+                    <p>Client: {{ order.user }}</p>
                     <p>Shipped: {{ order.shipped_at }}</p>
                 </div>
                 <div class="ms-3">
@@ -26,14 +27,11 @@
                 <div class="ms-3 d-flex gap-3">
                     {% if order.status.id == 1 %} <!-- status.id 1 is for 'IN THE MAKING' -->
                         <div class="ms-3">
-                            <form method="post" action="{% url 'cancel_order' order.id %}">
+                            <form method="post" action="{% url 'change_order_status' order.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                <button type="submit" class="btn btn-outline-success">Send Order</button>
                             </form>
                         </div>
-                    {% endif %}
-                    {% if order.status.id == 3 %} <!-- status.id 3 is for 'DELIVERED' -->
-                        <h2>Reso</h2>
                     {% endif %}
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                             data-bs-target="#orderDetails{{ order.id }}">
