@@ -38,7 +38,7 @@ Here I'll go more into the details of the features and functionalities of the e-
 
 - **Product Browsing**: Customers and Managers can browse products by category, search for specific products, and view product details. Products are displayed with their images, descriptions, prices, and stock availability.
 
-- **Shopping Cart**: Customers can add products to their shopping cart, view the cart, and update quantities or remove items. In the cart you can then check out and place an order.
+- **Shopping Cart**: Customers can add products to their shopping cart, view the cart, and update quantities or remove items. In the cart you can then check out and place an order. The checkout button will check if all the products in the cart have available stock for the order. The cart itself will display if an item is out of stock.
 
 - **Wishlist**: Customers can add products to their wishlist for future reference. They can view and manage their wishlist items.
 

@@ -24,7 +24,8 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in cart_products %}
+        {% for entry in cart_products %}
+            {% with item=entry.item stock=entry.stock_available %}
             <tr>
                 <td>{{ item.product.name }}</td>
                 <td>{{ item.size.name }}</td>
@@ -37,6 +38,7 @@
                     {% endif %}
                 </td>
             </tr>
+            {% endwith %}
         {% endfor %}
         </tbody>
     </table>

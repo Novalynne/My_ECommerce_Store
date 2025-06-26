@@ -15,42 +15,47 @@
             </div>
         {% endfor %}
     {% endif %}
-    {% for item in cart_products %}
-        <div class="mb-4 cart-container">
-            <div class="d-flex align-items-center justify-content-between">
-                <img src="{{ item.product.image.url }}" width="100" height="150" alt="{{ item.product.name }}">
-                <div class="ms-3">
-                    <div class="card-header">
-                        <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a> - {{ item.size }}
-                    </div>
-                    <div class="card-body mt-2 mb-2">
-                        {% if item.product.is_sale %}
-                            <div class="badge bg-dark text-white">-{{ item.product.discount_percentage }}%</div>
-                            <strike>€{{ item.product.price }}</strike>
-                            <span class="text-danger"><strong>€{{ item.product.sale_price }}</strong></span>
-                        {% else %}
-                            <span><strong>€{{ item.product.price }}</strong></span>
+    {% for entry in cart_products %}
+        {% with item=entry.item stock=entry.stock_available %}
+            <div class="mb-4 cart-container">
+                <div class="d-flex align-items-center justify-content-between">
+                    <img src="{{ item.product.image.url }}" width="100" height="150" alt="{{ item.product.name }}">
+                    <div class="ms-3">
+                        <div class="card-header">
+                            <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a> - {{ item.size }}
+                        </div>
+                        <div class="card-body mt-2 mb-2">
+                            {% if item.product.is_sale %}
+                                <div class="badge bg-dark text-white">-{{ item.product.discount_percentage }}%</div>
+                                <strike>€{{ item.product.price }}</strike>
+                                <span class="text-danger"><strong>€{{ item.product.sale_price }}</strong></span>
+                            {% else %}
+                                <span><strong>€{{ item.product.price }}</strong></span>
+                            {% endif %}
+                        </div>
+                        {% if stock == 0 %}
+                            <div class="badge bg-danger">Out of Stock</div>
                         {% endif %}
                     </div>
+                    <div>
+                        <form method="post" action="{% url 'update_cart' %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                            <input type="hidden" name="size_name" value="{{ item.size.name }}">
+                            <button type="submit" name="action" value="decrease" class="btn btn-secondary">-</button>
+                            {{ item.quantity }}
+                            <button type="submit" name="action" value="increase" class="btn btn-secondary">+</button>
+                        </form>
+                        <form method="post" action="{% url 'remove_from_cart' %}" class="mt-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                            <input type="hidden" name="size_name" value="{{ item.size.name }}">
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </div>
                 </div>
-            <div>
-                <form method="post" action="{% url 'update_cart' %}" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                    <input type="hidden" name="size_name" value="{{ item.size.name }}">
-                    <button type="submit" name="action" value="decrease" class="btn btn-secondary">-</button>
-                    {{ item.quantity }}
-                    <button type="submit" name="action" value="increase" class="btn btn-secondary">+</button>
-                </form>
-                <form method="post" action="{% url 'remove_from_cart' %}" class="mt-2">
-                    {% csrf_token %}
-                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                    <input type="hidden" name="size_name" value="{{ item.size.name }}">
-                    <button type="submit" class="btn btn-danger">Remove</button>
-                </form>
             </div>
-            </div>
-        </div>
+        {% endwith %}
     {% endfor %}
     <div class="text-end mt-4">
         <h3>Total: <span class="text-success">€{{ total|floatformat:2 }}</span></h3>

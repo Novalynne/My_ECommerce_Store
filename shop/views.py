@@ -26,26 +26,46 @@ class CartSummary(ListView):
         cart_products = Cart.objects.filter(user__user=user)
 
         total = 0
+        cart_with_stock = []
         for item in cart_products:
             price = item.product.sale_price if item.product.is_sale else item.product.price
             total += price * item.quantity
 
-        return cart_products, total
+            product_stock = ProductStock.objects.filter(product=item.product, size=item.size).first()
+            stock_available = product_stock.stock if product_stock else 0
+
+            cart_with_stock.append({
+                'item': item,
+                'stock_available': stock_available
+            })
+
+        return cart_with_stock, total
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         cart_products, total = self.get_cart_products_and_total()
         context['cart_products'] = cart_products
         context['total'] = total
         return context
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user
         cart_products, total = self.get_cart_products_and_total()
-        if not cart_products.exists():
+        if not cart_products:
             messages.warning(request, "Your cart is empty.")
             return redirect('cart_summary')
+
+        # Controllo stock
+        for cart_item in cart_products:
+            item = cart_item['item']
+            stock_available = cart_item['stock_available']
+
+            if stock_available <= 0:
+                messages.warning(request, f"No stock available for {item.product.name} in size {item.size.name}.")
+                return redirect('cart_summary')
+
+            if stock_available < item.quantity:
+                messages.warning(request, f"Not enough stock for {item.product.name} in size {item.size.name}. Available: {product_stock.stock}, Requested: {item.quantity}")
+                return redirect('cart_summary')
 
         context = {
             'cart_products': cart_products,
@@ -185,10 +205,10 @@ def place_order(request):
                     product_stock = ProductStock.objects.filter(product=item.product, size=item.size).first()
 
                     if not product_stock:
-                        raise ValueError(f"Not enough stock for {item.product.name} in size {item.size.name}.")
+                        raise ValueError(f"No stock available for {item.product.name} in size {item.size.name}.")
 
                     if product_stock.stock < item.quantity:
-                        raise ValueError(f"Not enough stock for {item.product.name} in size {item.size.name}.")
+                        raise ValueError(f"Not enough stock for {item.product.name} in size {item.size.name}. Available: {product_stock.stock}, Requested: {item.quantity}")
 
                     # Stock sufficiente, scala
                     product_stock.stock -= item.quantity
