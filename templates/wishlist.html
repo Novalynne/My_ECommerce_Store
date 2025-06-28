@@ -29,7 +29,7 @@
                 <div>
                     <form method="post" action="{% url 'toggle_wishlist' item.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
+                        <button type="submit" class="btn btn-outline-danger border-0">
                             {% if item in favourites %}
                                 <i class="fa-regular fa-heart"></i>
                             {% else %}
