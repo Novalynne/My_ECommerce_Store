@@ -13,4 +13,7 @@ urlpatterns = [
     path("order/", views.OrderSummery.as_view(), name="order_summary"),
     path("order/manage/", views.ManagerOrderList.as_view(), name="manage_orders"),
     path("order/manage/changestatus/<int:order_id>/", views.order_change_status, name="change_order_status"),
+    path("order/<int:order_id>/return/", views.order_return, name="return_order"),
+    path("order/<int:order_id>/return/confirm", views.submit_return_request, name="process_return"),
+    path('order/<int:order_id>/returns/', views.return_requests_for_order, name='return_requests_for_order'),
 ]

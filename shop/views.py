@@ -1,12 +1,12 @@
 import random
 from django.shortcuts import render, get_object_or_404
 from products.models import Product, ProductStock, Size
-from .forms import AddToCartForm
+from .forms import AddToCartForm, ReturnRequestForm
 from django.views.generic import ListView, DetailView
 from decimal import Decimal
 from django.shortcuts import redirect
 from django.contrib import messages
-from .models import Cart, Order, OrderProduct, Profile, Status
+from .models import Cart, Order, OrderProduct, Profile, Status, ReturnRequest
 from django.db import transaction
 from django.utils import timezone
 
@@ -64,7 +64,7 @@ class CartSummary(ListView):
                 return redirect('cart_summary')
 
             if stock_available < item.quantity:
-                messages.warning(request, f"Not enough stock for {item.product.name} in size {item.size.name}. Available: {product_stock.stock}, Requested: {item.quantity}")
+                messages.warning(request, f"Not enough stock for {item.product.name} in size {item.size.name}. Available: {stock_available}, Requested: {item.quantity}")
                 return redirect('cart_summary')
 
         context = {
@@ -249,6 +249,7 @@ class OrderSummery(ListView):
 
         for order in orders:
             order.update_status()
+            order.non_refundable()
 
         context['orders'] = orders
         return context
@@ -305,6 +306,73 @@ class ManagerOrderList(ListView):
 
         for order in orders:
             order.update_status()
+            order.non_refundable()
 
         context['orders'] = orders
         return context
+
+
+def order_return(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user.profile)
+    order_products = OrderProduct.objects.filter(order=order)
+
+    if order.status.name == 'RETURNED':
+        messages.warning(request, "This order has already been returned.")
+        return redirect('order_summary')
+
+    if order.status.name == 'NON REFUNDABLE':
+        messages.warning(request, "This order is not refundable.")
+        return redirect('order_summary')
+
+    form = ReturnRequestForm(order=order)
+
+    return render(request, 'return_order.html', {
+        'form': form,
+        'order': order,
+        'order_products': order_products
+    })
+
+@transaction.atomic
+def submit_return_request(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user.profile)
+
+    if request.method == 'POST':
+        form = ReturnRequestForm(request.POST, order=order)
+
+        if form.is_valid():
+            return_request = form.save(commit=False)
+            return_request.user = request.user.profile
+            return_request.order = order
+            return_request.save()
+            form.save_m2m()
+
+            order.status = Status.objects.get(name='RETURNED')
+            order.save()
+
+            for order_product in return_request.order_products.all():
+                product_stock, created = ProductStock.objects.get_or_create(
+                    product=order_product.product,
+                    size=order_product.size,
+                    defaults={'stock': 0}
+                )
+                product_stock.stock += order_product.quantity
+                product_stock.save()
+
+            messages.success(request, "Return request submitted successfully.")
+            return redirect('order_summary')
+    else:
+        form = ReturnRequestForm(order=order)
+    return render(request, 'return_order.html', {'form': form, 'order': order})
+
+def return_requests_for_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return_requests = ReturnRequest.objects.filter(order=order)
+
+    context = {
+        'order': order,
+        'return_requests': return_requests,
+    }
+    return render(request, 'return_requests_for_order.html', context)
+
+
+

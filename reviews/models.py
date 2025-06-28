@@ -21,7 +21,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review {self.rating}/5 by {self.user} on {self.product}"
-
-    # TODO: add review
-    # TODO: add review update
-    # TODO: add review delete

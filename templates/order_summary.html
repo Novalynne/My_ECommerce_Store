@@ -18,7 +18,12 @@
                 <div class="ms-3">
                     <p>Total: €{{ order.total }}</p>
                     <p>Address: {{ order.address }}</p>
-                    <p>Shipped: {{ order.shipped_at }}</p>
+                    {% if order.status.name == 'SHIPPED' %}
+                        <p>Shipped: {{ order.shipped_at }}</p>
+                    {% endif %}
+                    {% if order.status.name == 'ARRIVED' %}
+                        <p>Arrived: {{ order.arrived_at }}</p>
+                    {% endif %}
                 </div>
                 <div class="ms-3">
                     <p class="text-success">{{ order.status }}</p>
@@ -33,7 +38,9 @@
                         </div>
                     {% endif %}
                     {% if order.status.id == 3 %} <!-- status.id 3 is for 'DELIVERED' -->
-                        <h2>Reso</h2>
+                        <div class="ms-3">
+                            <a href="{% url 'return_order' order.id %}" class="btn btn-outline-info">Return</a>
+                        </div>
                     {% endif %}
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                             data-bs-target="#orderDetails{{ order.id }}">

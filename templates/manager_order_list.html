@@ -37,6 +37,8 @@
                             data-bs-target="#orderDetails{{ order.id }}">
                         Details
                     </button>
+                <a href="{% url 'return_requests_for_order' order.id %}" class="btn btn-primary">
+                    Return Requests</a>
                 </div>
             </div>
             <div class="collapse" id="orderDetails{{ order.id }}">

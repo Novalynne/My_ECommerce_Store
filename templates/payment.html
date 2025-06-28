@@ -13,37 +13,43 @@
         {% endfor %}
     {% endif %}
 
-    <h3>Order Summary</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Product</th>
-            <th>Size</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-        </tr>
-        </thead>
-        <tbody>
+    <div class="container my-4">
+        <h3 class="mb-4">Order Summary</h3>
+
+        <!-- Header -->
+        <div class="row fw-bold border-bottom pb-2">
+            <div class="col-4">Product</div>
+            <div class="col-2">Size</div>
+            <div class="col-3">Quantity</div>
+            <div class="col-3">Price (€)</div>
+        </div>
+
+        <!-- Items -->
         {% for entry in cart_products %}
             {% with item=entry.item stock=entry.stock_available %}
-            <tr>
-                <td>{{ item.product.name }}</td>
-                <td>{{ item.size.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>
-                    {% if item.product.is_sale %}
-                        {{ item.product.sale_price }}
-                    {% else %}
-                        {{ item.product.price }}
-                    {% endif %}
-                </td>
-            </tr>
+                <div class="row py-2 border-bottom align-items-center">
+                    <div class="col-4">{{ item.product.name }}</div>
+                    <div class="col-2">{{ item.size.name }}</div>
+                    <div class="col-3">{{ item.quantity }}</div>
+                    <div class="col-3">
+                        {% if item.product.is_sale %}
+                            <span class="text-success fw-bold">{{ item.product.sale_price }}</span>
+                        {% else %}
+                            {{ item.product.price }}
+                        {% endif %}
+                    </div>
+                </div>
             {% endwith %}
         {% endfor %}
-        </tbody>
-    </table>
 
-    <p><strong>Total: {{ total }} €</strong></p>
+        <!-- Total -->
+        <div class="row mt-3">
+            <div class="col text-end">
+                <h5><strong>Total:</strong> {{ total }} €</h5>
+            </div>
+        </div>
+    </div>
+
 
     <hr>
 
@@ -61,12 +67,12 @@
         <input type="text" id="cvv" name="cvv" required><br><br>
         
         <input type="hidden" name="total" value="{{ total }}">
-        <button type="submit">Make Order</button>
+        <button type="submit" class="btn-secondary btn">Make Order</button>
     </form>
 
     <br>
     <a href="{% url 'cart_summary' %}">
-        <button>Back to Cart</button>
+        <button class="btn-dark btn">Back to Cart</button>
     </a>
 
 {% endblock %}

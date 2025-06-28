@@ -26,6 +26,7 @@ class Order(models.Model):
     address = models.CharField(max_length=255)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name="status")
     shipped_at = models.DateTimeField(null=True, blank=True)
+    arrived_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Order #{self.id} by {self.user}"
@@ -36,8 +37,16 @@ class Order(models.Model):
             if shipped_duration > timedelta(minutes=5):
                 arrived_status = Status.objects.get(name='ARRIVED')
                 self.status = arrived_status
+                self.arrived_at = timezone.now()
                 self.save()
 
+    def non_refundable(self):
+        if self.status.name == 'ARRIVED':
+            refundable_time = timezone.now() - self.arrived_at
+            if refundable_time > timedelta(minutes=5):
+                non_refundable_status = Status.objects.get(name='NON REFUNDABLE')
+                self.status = non_refundable_status
+                self.save()
 
 
 class OrderProduct(models.Model):
@@ -49,7 +58,10 @@ class OrderProduct(models.Model):
     unit_price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.00'))], decimal_places=2) # price at the time of order
 
     class Meta:
-        unique_together = ("order", "product")
+        unique_together = ("order", "product", "size")
+
+    def __str__(self):
+        return f"Order {self.order.id} - {self.product.name} ({self.size})"
 
 
 
@@ -65,3 +77,25 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart item {self.pk} for user {self.user}"
+
+class ReturnRequest(models.Model):
+    REASONS = [
+        ('damaged', 'Damaged or defective'),
+        ('wrong_item', 'Wrong item received'),
+        ('not_satisfied', 'Not satisfied with the product'),
+        ('other', 'Other'),
+    ]
+
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="return_requests")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order_products = models.ManyToManyField(OrderProduct)
+    reason = models.CharField(max_length=20, choices=REASONS)
+    notes = models.TextField(blank=True, null=True)
+    date_requested = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        products = ', '.join([
+            f"{op.product.name} ({op.size})"
+            for op in self.order_products.all()
+        ])
+        return f"Return [{products}] from Order {self.order.id} by {self.user}"
+

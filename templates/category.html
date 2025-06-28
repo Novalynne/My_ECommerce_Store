@@ -24,7 +24,6 @@
 
     <hr>
 
-
     <ul>
         {% for cat in categories %}
             <li>
@@ -38,4 +37,6 @@
             </li>
         {% endfor %}
     </ul>
+    
+    <a href="{% url 'homepage' %}" class="btn btn-secondary w-100 mt-4">Back to Shop</a>
 {% endblock %}
