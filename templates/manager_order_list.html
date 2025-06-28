@@ -33,11 +33,11 @@
                             </form>
                         </div>
                     {% endif %}
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse"
                             data-bs-target="#orderDetails{{ order.id }}">
                         Details
                     </button>
-                <a href="{% url 'return_requests_for_order' order.id %}" class="btn btn-primary">
+                <a href="{% url 'return_requests_for_order' order.id %}" class="btn btn-outline-secondary">
                     Return Requests</a>
                 </div>
             </div>

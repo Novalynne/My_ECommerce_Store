@@ -23,13 +23,20 @@
             {% for product in products %}
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="card product-card">
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    
+                        <div class="position-relative">
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% if product.is_sale %}
+                                <div class="badge bg-dark text-white position-absolute"
+                                     style="top: 0.5rem; right: 0.5rem; z-index: 10;">
+                                    -{{ product.discount_percentage }}%
+                                </div>
+                            {% endif %}
+                        </div>
                         <div class="card-body text-center">
-                        
                         
                             <h3>{{ product.name }}</h3>
                             {% if product.is_sale %}
-                                <div class="badge bg-dark text-white">-{{ product.discount_percentage }}%</div>
                                 <strike>€{{ product.price }}</strike>
                                 <span class="text-danger"><strong>€{{ product.sale_price }}</strong></span>
                             {% else %}
@@ -40,7 +47,7 @@
                             {% if is_client %}
                                 <form method="post" action="{% url 'toggle_wishlist' product.id %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
+                                    <button type="submit" class="btn btn-outline-danger border-0">
                                         {% if product in favourites %}
                                             <i class="fa-solid fa-heart"></i>
                                         {% else %}
@@ -53,7 +60,7 @@
                         
                             {% if is_manager or is_admin %}
                                 <div>
-                                    <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary">
+                                    <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary mt-3">
                                         <i class="fa-solid fa-pen-to-square"></i> Edit
                                     </a>
                                 </div>
@@ -68,11 +75,9 @@
                             </div>
                         </div>
                     
-                    
                     </div>
                 </div>
             {% endfor %}
         </div>
     </div>
-
 {% endblock %}

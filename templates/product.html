@@ -11,64 +11,74 @@
             </div>
         {% endfor %}
     {% endif %}
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow-sm">
-                    {% if product.is_sale %}
-                        <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">-{{ product.discount_percentage }}%</div>
-                    {% endif %}
-                    <img src="{{ product.image.url }}" class="card-img-top" alt=""/>
-                    <div class="card-body text-center">
+    <div class="card shadow-sm p-3">
+        <div class="row g-0">
+            <div class="me-3 position-relative" style="flex: 0 0 40%;">
+                {% if product.is_sale %}
+                    <div class="badge bg-dark text-white position-absolute"
+                         style="top: 0.5rem; right: 0.5rem; z-index: 10;">-{{ product.discount_percentage }}%
+                    </div>
+                {% endif %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+            </div>
+            <div class="col-md-7">
+                <div class="card-body">
+                    <div class="d-flex inline-flex justify-content-between align-items-center mb-3">
                         <h3 class="card-title">{{ product.name }}</h3>
-                    
-                        {% if sizes %}
-                            <ul class="list-unstyled">
+                        {% if is_client %}
+                            <form method="post" action="{% url 'toggle_wishlist' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger border-0">
+                                    {% if product in favorites %}
+                                        <i class="fa-solid fa-heart"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-heart"></i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if is_manager or is_admin %}
+                            <div>
+                                <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if sizes %}
+                        <ul class="list-unstyled">
                             {% for product in sizes %}
                                 <li>{{ product.size.name }} (Available: {{ product.stock }})</li>
                             {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span class="text-danger"><strong>No sizes available</strong></span>
+                        </ul>
+                    {% else %}
+                        <span class="text-danger"><strong>No sizes available</strong></span>
+                    {% endif %}
+
+                    <p class="card-text text-muted"><strong>Description:</strong> {{ product.description }}</p>
+
+                    {% if product.is_sale %}
+                        <strike>€{{ product.price }}</strike>
+                        <span class="text-danger"><strong>€{{ product.sale_price }}</strong></span>
+                    {% else %}
+                        <span><strong>€{{ product.price }}</strong></span>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        {% if is_client %}
+                            <form method="post" action="{% url 'add_to_cart' %}">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-secondary w-100">Add to cart</button>
+                            </form>
                         {% endif %}
-                    
-                        <p class="card-text text-muted">{{ product.description }}</p>
-                        {% if product.is_sale %}
-                            <strike>€{{ product.price }}</strike>
-                            <span class="text-danger"><strong>€{{ product.sale_price }}</strong></span>
-                        {% else %}
-                            <span><strong>€{{ product.price }}</strong></span>
-                        {% endif %}
-                    
-                        <div class="d-flex justify-content-center gap-3 p-3">
-                            {% if is_client %}
-                                <form method="post" action="{% url 'toggle_wishlist' product.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-link p-0 border-0 bg-transparent">
-                                        {% if product in favorites %}
-                                            <i class="fa-solid fa-heart"></i>
-                                        {% else %}
-                                            <i class="fa-regular fa-heart"></i>
-                                        {% endif %}
-                                    </button>
-                                </form>
-                                <form method="post" action="{% url 'add_to_cart' %}">
-                                    {% csrf_token %}
-                                    {{ form.as_p }}
-                                    <input type="hidden" name="product_id" value="{{ product.id }}">
-                                    <button type="submit" class="btn btn-secondary w-100 mb-3">Add to cart</button>
-                                </form>
-                            {% endif %}
-                        
-                            {% if is_manager or is_admin %}
-                                <div>
-                                    <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary">
-                                        <i class="fa-solid fa-pen-to-square"></i> Edit
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
                     </div>
+
+                    <a href="{% url 'homepage' %}" class="btn w-100 btn-secondary mt-2">Back to Shop</a>
+
                 </div>
             </div>
         </div>
