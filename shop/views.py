@@ -2,7 +2,7 @@ import random
 from django.shortcuts import render, get_object_or_404
 from products.models import Product, ProductStock, Size
 from .forms import AddToCartForm, ReturnRequestForm
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView
 from decimal import Decimal
 from django.shortcuts import redirect
 from django.contrib import messages

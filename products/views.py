@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .forms import AddToShopForm, SizeStockFormSet, ProductForm
+from .forms import SizeStockFormSet, ProductForm
 from .models import Product, ProductStock, Size, Category
 from shop.forms import AddToCartForm
 from accounts.models import Profile
@@ -27,7 +27,6 @@ def product(request,pk):
 
 @transaction.atomic
 def add_to_shop(request):
-    user = request.user
     sizes = Size.objects.all()
     initial = [{'size': s} for s in sizes]
     if request.method == "POST":
@@ -56,7 +55,6 @@ def add_to_shop(request):
 
 @transaction.atomic
 def edit_product(request, pk):
-    user = request.user
     product = get_object_or_404(Product, pk=pk)
     sizes = Size.objects.all()
     initial = []
@@ -101,7 +99,6 @@ def delete_product(request, pk):
     return redirect("edit_product", pk=pk)
 
 def manage_categories(request):
-    user = request.user
     categories = Category.objects.all()
 
     if request.method == "POST":

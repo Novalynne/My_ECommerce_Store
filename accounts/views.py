@@ -90,7 +90,6 @@ class ManageProfilesView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         query = self.request.GET.get('q')
         base_clients = Profile.objects.filter(user__groups__name='client')
         base_managers = Profile.objects.filter(user__groups__name='manager')
