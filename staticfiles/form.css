@@ -1,0 +1,13 @@
+.asteriskField {
+    display: none;
+}
+
+label {
+    font-weight: bold;
+}
+
+.helptext,
+.form-text,
+.text-muted {
+    display: none !important;
+}

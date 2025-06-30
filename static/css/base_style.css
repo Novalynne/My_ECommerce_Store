@@ -3,21 +3,25 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
-main {
-    flex: 1 0 auto;
-}
-footer {
-    flex-shrink: 0;
+
+.navbar {
+    position: fixed; !important;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
-.mainblock {
-  display: flex;
-  justify-content: center; /* centra orizzontalmente */
-  align-items: center;     /* centra verticalmente */
-  height: 100vh;           /* altezza viewport */
+main {
+    flex: 1;
+    margin-top: 56px;  !important;
+}
+
+footer {
+    padding: 20px;
 }

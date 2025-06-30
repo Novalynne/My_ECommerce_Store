@@ -1,8 +1,8 @@
-from django.shortcuts import render,  redirect, get_object_or_404
+from django.shortcuts import render
 from django.views.generic.list import ListView
-
+from django.db.models import Q
 from accounts.models import Profile
-from products.models import Product, Category, Size, ProductStock
+from products.models import Product
 from pages.forms import SearchForm
 
 # Create your views here.
@@ -10,7 +10,7 @@ from pages.forms import SearchForm
 def frontpage(request):
     return render(request, 'front_page.html')
 
-class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
+class homepage(ListView):
     model = Product
     template_name = 'home_page.html'
     paginate_by = 10
@@ -19,18 +19,12 @@ class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
     def get_queryset(self):
         queryset = super().get_queryset()
         search_form = SearchForm(self.request.GET or None)
-        print("GET params:", self.request.GET)
         if search_form.is_valid():
             search = search_form.cleaned_data.get("search")
-            print("Search term:", search)
             categories = search_form.cleaned_data.get('category')
-            print("Selected categories:", categories)
             sizes = search_form.cleaned_data.get('size')
-            print("Selected sizes:", sizes)
             min_price = search_form.cleaned_data.get('min_price')
-            print("Minimum price:", min_price)
             max_price = search_form.cleaned_data.get('max_price')
-            print("Maximum price:", max_price)
             if search:
                 queryset = queryset.filter(name__icontains=search)
 
@@ -38,13 +32,19 @@ class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
                 queryset = queryset.filter(categories__in=categories)
 
             if sizes:
-                queryset = queryset.filter(stock__size__in=sizes)
+                queryset = queryset.filter(product__size__in=sizes)
 
             if min_price is not None:
-                queryset = queryset.filter(price__gte=min_price)
+                queryset = queryset.filter(
+                    Q(sale_price__gte=min_price) |
+                    Q(sale_price__isnull=True, price__gte=min_price)
+                )
 
             if max_price is not None:
-                queryset = queryset.filter(price__lte=max_price)
+                queryset = queryset.filter(
+                    Q(sale_price__lte=max_price) |
+                    Q(sale_price__isnull=True, price__lte=max_price)
+                )
 
             queryset = queryset.distinct()
 
@@ -57,39 +57,3 @@ class homepage(ListView): #TODO: FIX SEARCH FUNCTIONALITY
         context['favourites'] = favourite
         context['search_form'] = SearchForm(self.request.GET)
         return context
-
-'''
-def search_page_view(request):
-    if request.method == "POST":
-        search_form = SearchForm(request.POST)
-        products = Product.objects.all()
-        if search_form.is_valid():
-            search = search_form.cleaned_data["search"]
-            category = search_form.cleaned_data['category']
-            size = search_form.cleaned_data['size']
-            min_price = search_form.cleaned_data['min_price']
-            max_price = search_form.cleaned_data['max_price']
-
-            if search is not None:
-                products = products.filter(name__icontains=search)
-
-            if category is not None:
-                products = products.filter(category=category)
-
-            if size is not None:
-                products = products.filter(size=size)
-
-            if min_price is not None:
-                products = products.filter(price__gte=min_price)
-
-            if max_price is not None:
-                products = products.filter(price__lte=max_price)
-
-            return render(request, 'home_page.html', {
-                'search_form': search_form,
-                'products': products})
-
-    else:
-        search_form = SearchForm()
-        return redirect(request, "homepage", {"form": search_form})
-'''

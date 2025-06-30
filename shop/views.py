@@ -174,7 +174,7 @@ def toggle_wishlist(request, product_id):
     return redirect('homepage')
 
 # --- ORDER VIEWS ---
-# place_order, 0rderSummary, cancel_order, order_change_status, ManagerOrderList
+# place_order, 0rderSummary, cancel_order, order_change_status, ManagerOrderList, order_return, submit_return_request, return_requests_for_order
 
 def place_order(request):
     user = request.user
@@ -195,6 +195,7 @@ def place_order(request):
                 order = Order.objects.create(
                     user=profile,
                     address=profile.address,
+                    user_email=profile.user.email,
                     total=total,
                     status_id=1
                 )
@@ -219,6 +220,7 @@ def place_order(request):
                     order_product = OrderProduct(
                         order=order,
                         product=item.product,
+                        product_name=item.product.name,
                         quantity=item.quantity,
                         size=item.size,
                         unit_price=item.product.price if not item.product.is_sale else item.product.sale_price

@@ -25,12 +25,6 @@ def product(request,pk):
     }
     return render(request, 'product.html', context)
 
-def category(request, foo):
-    pass
-
-def category_summary(request):
-    pass
-
 @transaction.atomic
 def add_to_shop(request):
     user = request.user
@@ -98,7 +92,6 @@ def edit_product(request, pk):
         'formset': formset,
         'product': product,
     })
-
 
 def delete_product(request, pk):
     product = get_object_or_404(Product, pk=pk)

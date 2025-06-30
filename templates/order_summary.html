@@ -53,7 +53,11 @@
                     <ul class="list-group">
                         {% for item in order.products.all %}
                             <li class="list-group-item d-flex align-items-center gap-5">
-                                <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a>
+                                {% if item.product %}
+                                    <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a>
+                                {% else %}
+                                    <span>{{ item.product_name }}</span>
+                                {% endif %}
                                 <span> Size: {{ item.size }}</span>
                                 <span> Quantity: {{ item.quantity }}</span>  
                                 <span> Price: €{{ item.unit_price }}</span>

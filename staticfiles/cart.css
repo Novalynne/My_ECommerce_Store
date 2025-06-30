@@ -1,0 +1,12 @@
+.cart-container {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin: 20px;
+  border-radius: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.cart-body{
+  gap: 10px;
+}

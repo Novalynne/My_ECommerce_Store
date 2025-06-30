@@ -8,76 +8,120 @@
 
 {% block title %}Home Page{% endblock title %}
 
-{% block searchbar %}
-    <form method="get" novalidate action="{% url 'homepage' %}" class="gap-3 d-flex align-items-center">
-        {{ search_form.as_p }}
-        <button type="submit" class="btn btn-outline-light me-2"><i
-                class="fa-solid fa-magnifying-glass"></i>
-        </button>
-    </form> <!-- TODO: Search Form -->
-{% endblock %}
-
 {% block content %}
+    <form method="get" action="{% url 'homepage' %}" class="d-flex flex-wrap gap-2 align-items-center">
+
+        <!-- Search Input -->
+        <div>
+            {{ search_form.search }}
+        </div>
+
+        <!-- Dropdown Category-->
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Category
+            </button>
+            <div class="dropdown-menu p-3">
+                {{ search_form.category }}
+            </div>
+        </div>
+
+        <!-- Dropdown Sizes -->
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Sizes
+            </button>
+            <div class="dropdown-menu p-3">
+                {{ search_form.size }}
+            </div>
+        </div>
+
+        <!-- Price Filters -->
+        <div>
+            {{ search_form.min_price }}
+        </div>
+        <div>
+            {{ search_form.max_price }}
+        </div>
+
+        <!-- Search Button -->
+        <div>
+            <button type="submit" class="btn btn-outline-dark border-0">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+        </div>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     <div class="container my-5">
         <div class="row g-4">
-            {% for product in products %}
-                <div class="col-sm-6 col-md-4 col-lg-3">
-                    <div class="card product-card">
-                    
-                        <div class="position-relative">
-                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                            {% if product.is_sale %}
-                                <div class="badge bg-dark text-white position-absolute"
-                                     style="top: 0.5rem; right: 0.5rem; z-index: 10;">
-                                    -{{ product.discount_percentage }}%
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="card-body text-center">
-                        
-                            <h3>{{ product.name }}</h3>
-                            {% if product.is_sale %}
-                                <strike>€{{ product.price }}</strike>
-                                <span class="text-danger"><strong>€{{ product.sale_price }}</strong></span>
-                            {% else %}
-                                <span><strong>€{{ product.price }}</strong></span>
-                            {% endif %}
-                        
-                        
-                            {% if is_client %}
-                                <form method="post" action="{% url 'toggle_wishlist' product.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger border-0">
-                                        {% if product in favourites %}
-                                            <i class="fa-solid fa-heart"></i>
-                                        {% else %}
-                                            <i class="fa-regular fa-heart"></i>
-                                        {% endif %}
-                                    </button>
-                                </form>
-                            {% endif %}
-                        
-                        
-                            {% if is_manager or is_admin %}
-                                <div>
-                                    <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary mt-3">
-                                        <i class="fa-solid fa-pen-to-square"></i> Edit
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    
-                    
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent mt-3">
-                            <div class="text-center">
-                                <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View
-                                    Product</a>
+            {% if products %}
+                {% for product in products %}
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="card product-card">
+
+                            <div class="position-relative">
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                {% if product.is_sale %}
+                                    <div class="badge bg-dark text-white position-absolute"
+                                         style="top: 0.5rem; right: 0.5rem; z-index: 10;">
+                                        -{{ product.discount_percentage }}%
+                                    </div>
+                                {% endif %}
                             </div>
+                            <div class="card-body text-center">
+
+                                <h3>{{ product.name }}</h3>
+                                {% if product.is_sale %}
+                                    <strike>€{{ product.price }}</strike>
+                                    <span class="text-danger"><strong>€{{ product.sale_price }}</strong></span>
+                                {% else %}
+                                    <span><strong>€{{ product.price }}</strong></span>
+                                {% endif %}
+
+
+                                {% if is_client %}
+                                    <form method="post" action="{% url 'toggle_wishlist' product.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger border-0">
+                                            {% if product in favourites %}
+                                                <i class="fa-solid fa-heart"></i>
+                                            {% else %}
+                                                <i class="fa-regular fa-heart"></i>
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+
+                                {% if is_manager or is_admin %}
+                                    <div>
+                                        <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary mt-3">
+                                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent mt-3">
+                                <div class="text-center">
+                                    <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View
+                                        Product</a>
+                                </div>
+                            </div>
+
                         </div>
-                    
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <p class="alert alert-warning">No products found matching your criteria.</p>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -18,7 +18,11 @@
                 <div class="ms-3">
                     <p>Total: €{{ order.total }}</p>
                     <p>Address: {{ order.address }}</p>
-                    <p>Client: {{ order.user }}</p>
+                    {% if order.user %}
+                        <p>Client e-mail: {{ order.user.user.email }}</p>
+                    {% else %}
+                        <p>Client e-mail: {{ order.user_email }}</p>
+                    {% endif %}
                     <p>Shipped: {{ order.shipped_at }}</p>
                 </div>
                 <div class="ms-3">
@@ -46,7 +50,11 @@
                     <ul class="list-group">
                         {% for item in order.products.all %}
                             <li class="list-group-item d-flex align-items-center gap-5">
-                                <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a>
+                                {% if item.product %}
+                                    <a href="{% url 'product' item.product.id %}">{{ item.product.name }}</a>
+                                {% else %}
+                                    <span>{{ item.product_name }}</span>
+                                {% endif %}
                                 <span> Size: {{ item.size }}</span>
                                 <span> Quantity: {{ item.quantity }}</span>  
                                 <span> Price: €{{ item.unit_price }}</span>

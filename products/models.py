@@ -1,7 +1,6 @@
 from django.db import models
-from django.urls import reverse
 from _decimal import Decimal
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 from cloudinary.models import CloudinaryField
 
 # Create your models here.
