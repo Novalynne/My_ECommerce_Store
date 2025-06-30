@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',  # Custom app for user accounts
     'products.apps.ProductsConfig',  # Custom app for product management
     'shop.apps.ShopConfig',          # Custom app for order and cart management
-    'reviews.apps.ReviewsConfig',    # Custom app for reviews
     'cloudinary',                    # Cloudinary for media management
     'crispy_forms',                  # For better form rendering
     'crispy_bootstrap4',             # Bootstrap 5 integration for crispy forms

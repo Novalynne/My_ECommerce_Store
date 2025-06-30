@@ -25,7 +25,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),  # User account management
     path('products/', include('products.urls')),  # Product management
     path('shop/', include('shop.urls')),          # Order and cart management
-    path('reviews/', include('reviews.urls')),    # Product reviews
     path('', include('pages.urls')),              # Static pages (home, about, contact, etc.)
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
