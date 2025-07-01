@@ -21,7 +21,7 @@
                     {% if order.status.name == 'SHIPPED' %}
                         <p>Shipped: {{ order.shipped_at }}</p>
                     {% endif %}
-                    {% if order.status.name == 'ARRIVED' %}
+                    {% if order.status.name == 'DELIVERED' %}
                         <p>Arrived: {{ order.arrived_at }}</p>
                     {% endif %}
                 </div>

@@ -37,7 +37,7 @@ class Order(models.Model):
         if self.status.name == 'SHIPPED' and self.shipped_at:
             shipped_duration = timezone.now() - self.shipped_at
             if shipped_duration > timedelta(minutes=5):
-                arrived_status = Status.objects.get(name='ARRIVED')
+                arrived_status = Status.objects.get(name='DELIVERED')
                 self.status = arrived_status
                 self.arrived_at = timezone.now()
                 self.save()
