@@ -34,8 +34,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-1*c-v$e=e@6))c
 #DEBUG = True
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['djangoppmtc-production.up.railway.app', 'localhost', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://djangoppmtc-production.up.railway.app']
+ALLOWED_HOSTS = ['myecommercestore-production.up.railway.app', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://myecommercestore-production.up.railway.app']
 #CSRF_COOKIE_SECURE = env('COOKIE_SECURE', default=False)
 #SESSION_COOKIE_SECURE = env('COOKIE_SECURE', default=False)
 
