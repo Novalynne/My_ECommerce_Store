@@ -43,7 +43,7 @@ class Order(models.Model):
                 self.save()
 
     def non_refundable(self):
-        if self.status.name == 'ARRIVED':
+        if self.status.name == 'DELIVERED' and self.arrived_at:
             refundable_time = timezone.now() - self.arrived_at
             if refundable_time > timedelta(minutes=5):
                 non_refundable_status = Status.objects.get(name='NON REFUNDABLE')

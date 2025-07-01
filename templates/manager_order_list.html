@@ -29,7 +29,7 @@
                     <p class="text-success">{{ order.status }}</p>
                 </div>
                 <div class="ms-3 d-flex gap-3">
-                    {% if order.status.id == 1 %} <!-- status.id 1 is for 'IN THE MAKING' -->
+                    {% if order.status.name == 'IN THE MAKING' %} 
                         <div class="ms-3">
                             <form method="post" action="{% url 'change_order_status' order.id %}">
                                 {% csrf_token %}
