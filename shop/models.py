@@ -15,6 +15,7 @@ class Status(models.Model):
         return self.name
 
     class Meta:
+        db_table = "Statuses"
         ordering = ['name']
         verbose_name_plural = "Statuses"
 
@@ -60,6 +61,7 @@ class OrderProduct(models.Model):
     unit_price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.00'))], decimal_places=2) # price at the time of order
 
     class Meta:
+        db_table = 'OrderProducts'
         unique_together = ("order", "product", "size")
 
     def __str__(self):
@@ -75,6 +77,7 @@ class Cart(models.Model):
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
+        db_table = 'Cart'
         unique_together = ("user", "product", "size")
 
     def __str__(self):

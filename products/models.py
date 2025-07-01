@@ -39,7 +39,7 @@ class Product(models.Model):
     sale_price = models.DecimalField(max_digits=10, validators=[MinValueValidator(Decimal('0.01'))],decimal_places=2, blank=True, null=True)
 
     class Meta:
-        db_table = 'products'
+        db_table = 'Products'
         ordering = ['name']
 
     def __str__(self):
@@ -59,6 +59,7 @@ class ProductStock(models.Model):
     stock = models.PositiveIntegerField(default=0)
 
     class Meta:
+        db_table = 'Product_stock'
         unique_together = ('product', 'size')
 
     def __str__(self):

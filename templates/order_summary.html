@@ -29,7 +29,7 @@
                     <p class="text-success">{{ order.status }}</p>
                 </div>
                 <div class="ms-3 d-flex gap-3">
-                    {% if order.status.id == 1 %} <!-- status.id 1 is for 'IN THE MAKING' -->
+                    {% if order.status.name == 'IN THE MAKING' %} 
                         <div class="ms-3">
                             <form method="post" action="{% url 'cancel_order' order.id %}">
                                 {% csrf_token %}
@@ -37,7 +37,7 @@
                             </form>
                         </div>
                     {% endif %}
-                    {% if order.status.id == 3 %} <!-- status.id 3 is for 'DELIVERED' -->
+                    {% if order.status.name == 'DELIVERED' %} 
                         <div class="ms-3">
                             <a href="{% url 'return_order' order.id %}" class="btn btn-outline-secondary">Return</a>
                         </div>

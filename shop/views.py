@@ -260,7 +260,7 @@ def cancel_order(request, order_id):
     user = request.user
     order = get_object_or_404(Order, id=order_id, user__user=user)
 
-    if order.status.id != 1:  # 1 = "IN THE MAKING" , it is just a double check it shoud never occour for the order to not be in the making
+    if order.status.name != 'IN THE MAKING':  #it is just a double check it shoud never occour for the order to not be in the making
         messages.warning(request, "Order isn't in the making.")
         return redirect("order_summary")
 
