@@ -13,7 +13,6 @@ def frontpage(request):
 class homepage(ListView):
     model = Product
     template_name = 'home_page.html'
-    paginate_by = 10
     context_object_name = 'products'
 
     def get_queryset(self):
