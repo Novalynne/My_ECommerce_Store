@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
+import dj_database_url
+
+#import environ
+
+#env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +27,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1*c-v$e=e@6))c47s#_n-m=6bz)85ie6+le!&d*tpv1jjh!xyk'
+#SECRET_KEY = 'django-insecure-1*c-v$e=e@6))c47s#_n-m=6bz)85ie6+le!&d*tpv1jjh!xyk'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-1*c-v$e=e@6))c47s#_n-m=6bz)85ie6+le!&d*tpv1jjh!xyk')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['djangoppmtc-production.up.railway.app', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://djangoppmtc-production.up.railway.app']
+#CSRF_COOKIE_SECURE = env('COOKIE_SECURE', default=False)
+#SESSION_COOKIE_SECURE = env('COOKIE_SECURE', default=False)
 
 
 # Application definition
@@ -89,6 +99,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
