@@ -23,6 +23,14 @@ second user group) will be able to manage products, categories, and orders.
 ## Link to the project
 [My-E-Commerce-Store](https://myecommercestore-production.up.railway.app/)
 
+Manager account: 
+- **Username:** manager 
+- **Password:** managerthegratest<br>
+
+Admin account: 
+- **Username:** admin 
+- **Password:** admin<br>
+
 ## Features
 This project is a complete e-commerce website that allows users to browse products, manage their accounts, and place orders. It includes functionalities for both customers and store managers, ensuring a comprehensive shopping experience.
 
