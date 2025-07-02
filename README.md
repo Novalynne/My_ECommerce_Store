@@ -20,6 +20,9 @@ searches, adding items to the cart, and processing orders. The template complexi
 reduced by using CSS frameworks like Bootstrap to style the store. Store managers (a
 second user group) will be able to manage products, categories, and orders.
 
+## Link to the project
+[My-E-Commerce-Store](https://myecommercestore-production.up.railway.app/)
+
 ## Features
 This project is a complete e-commerce website that allows users to browse products, manage their accounts, and place orders. It includes functionalities for both customers and store managers, ensuring a comprehensive shopping experience.
 
@@ -28,6 +31,8 @@ There are three types of users: customers, store managers and admin.
 Customers can manage their accounts, manage their cart, and place orders. They can also view their order history and favorite products.
 Store managers can manage products, categories, and view all orders placed by customers.
 Admin is like a manager with the ability to make more managers, he can do everything a manager can plus manage users.
+
+MyStore is a button that will take you to the front page if you are not loggen in, or will take you to the home page if you are loggen in.
 
 Here I'll go more into the details of the features and functionalities of the e-commerce store.
 
