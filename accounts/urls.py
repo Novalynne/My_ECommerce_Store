@@ -11,4 +11,6 @@ urlpatterns = [
     path('profile/manage/managers/', views.ManageProfilesView.as_view(), name='manage_profiles'),
     path('profile/manage/managers/promote/<int:user_id>/', views.promote_to_manager, name='promote_to_manager'),
     path('profile/manage/managers/demote/<int:user_id>/', views.demote_to_client, name='demote_to_client'),
+    path('profile/password/reset/', views.password_reset_request, name='password_reset'),
+    path('profile/password/reset/<int:user_id>/confirm', views.password_reset_confirm_view, name='password_reset_confirm'),
 ]

@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import login, logout, update_session_auth_hash
-from .forms import CustomUserCreationForm, EditProfileForm
+from .forms import CustomUserCreationForm, EditProfileForm, PasswordResetRequestForm
 from django.contrib.auth.models import Group, User
 from django.views.generic import ListView, DetailView
 from .models import Profile
+from django.contrib import messages
 
 def register_view(request):
     if request.method == "POST":
@@ -122,3 +123,32 @@ def demote_to_client(request, user_id):
         user.groups.add(client_group)
         return redirect("manage_profiles")
     return render(request, 'managers.html', {'user': user})
+
+def password_reset_request(request):
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+
+            try:
+                user = User.objects.get(username=username, email=email)
+                return redirect('password_reset_confirm', user_id=user.id)
+            except User.DoesNotExist:
+                messages.warning(request, 'Username or email incorrect.')
+        else:
+            messages.warning(request, 'Please correct the errors below.')
+    else:
+        form = PasswordResetRequestForm()
+
+    return render(request, 'password_reset_request.html', {'form': form})
+
+def password_reset_confirm_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    form = SetPasswordForm(user, request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('login')
+    return render(request, 'password_reset_confirm.html', {'user': user, 'form': form})

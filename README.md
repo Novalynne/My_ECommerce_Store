@@ -32,7 +32,7 @@ Admin is like a manager with the ability to make more managers, he can do everyt
 Here I'll go more into the details of the features and functionalities of the e-commerce store.
 
 ## Features Overview
-- **User Management**: Users can register, log in, and manage their profiles. Such as updating personal information and changing passwords. If a user deletes their account, all their data will be deleted, including their cart, but not their orders.
+- **User Management**: Users can register, log in, and manage their profiles. Such as updating personal information and changing passwords. If a user deletes their account, all their data will be deleted, including their cart, but not their orders. If a user forgets their password they can reset it using their email and username.
 
 - **Product Management**: Store managers can add, edit, and delete products. They can also manage product categories, deleting or adding categories as needed. Every product has a stock quantity and a price/sale price that can be changed by the manager at all times. If a product is deleted, all carts that contain that product will have it removed from the cart, orders will not be deleted. If a product is out of stock, it will not be available for purchase, and the manager can update the stock quantity when new stock arrives.
 

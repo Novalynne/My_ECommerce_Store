@@ -110,3 +110,7 @@ class EditProfileForm(forms.ModelForm):
             profile.user = user
             profile.save()
         return profile
+
+class PasswordResetRequestForm(forms.Form):
+    username = forms.CharField(max_length=150, label='Username')
+    email = forms.EmailField(label='Email')

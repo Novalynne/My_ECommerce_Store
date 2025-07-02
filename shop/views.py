@@ -125,7 +125,11 @@ def update_cart(request):
         cart_item = Cart.objects.filter(user=profile, product=product, size=size).first()
         if cart_item:
             if action == "increase":
-                stock = ProductStock.objects.get(product=product, size=size)
+                try:
+                    stock = ProductStock.objects.get(product=product, size=size)
+                except ProductStock.DoesNotExist:
+                    messages.warning(request, "Stock not available for this product.")
+                    return redirect("cart_summary")
                 if cart_item.quantity < stock.stock:
                     cart_item.quantity += 1
                     cart_item.save()

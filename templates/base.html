@@ -21,12 +21,12 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and request.resolver_match.url_name != 'password_reset_confirm'%}
             <a class="navbar-brand" href="{% url 'homepage' %}">MyStore</a>
         {% else %}
             <a class="navbar-brand" href="{% url 'frontpage' %}">MyStore</a>
         {% endif %}
-        {% if request.resolver_match.url_name != 'frontpage' and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+        {% if request.resolver_match.url_name != 'frontpage' and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' and request.resolver_match.url_name != 'password_reset' and request.resolver_match.url_name != 'password_reset_confirm' %}
             <div>
 
                 {% if is_client %}
