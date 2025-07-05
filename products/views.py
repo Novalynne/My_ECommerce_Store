@@ -5,9 +5,12 @@ from .models import Product, ProductStock, Size, Category
 from shop.forms import AddToCartForm
 from accounts.models import Profile
 from django.db import transaction
+from django.contrib.auth.decorators import login_required, user_passes_test
+from utils.utils import is_manager_or_admin
 
 # Create your views here.
 
+@login_required(login_url='login')
 def product(request,pk):
     product = Product.objects.get(id=pk)
     size = ProductStock.objects.filter(product=product)
@@ -25,6 +28,8 @@ def product(request,pk):
     }
     return render(request, 'product.html', context)
 
+@login_required(login_url='login')
+@user_passes_test(is_manager_or_admin, login_url='login')
 @transaction.atomic
 def add_to_shop(request):
     sizes = Size.objects.all()
@@ -53,6 +58,8 @@ def add_to_shop(request):
         'form': form, 'formset': formset,
     })
 
+@login_required(login_url='login')
+@user_passes_test(is_manager_or_admin, login_url='login')
 @transaction.atomic
 def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -91,6 +98,8 @@ def edit_product(request, pk):
         'product': product,
     })
 
+@login_required(login_url='login')
+@user_passes_test(is_manager_or_admin, login_url='login')
 def delete_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if request.method == "POST" and 'confirm_delete' in request.POST:
@@ -98,6 +107,8 @@ def delete_product(request, pk):
         return redirect("homepage")
     return redirect("edit_product", pk=pk)
 
+@login_required(login_url='login')
+@user_passes_test(is_manager_or_admin, login_url='login')
 def manage_categories(request):
     categories = Category.objects.all()
 

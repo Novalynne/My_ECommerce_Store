@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -6,6 +7,8 @@ from django.contrib.auth.models import Group, User
 from django.views.generic import ListView, DetailView
 from .models import Profile
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from utils.utils import is_manager, is_client, is_admin, is_manager_or_admin
 
 def register_view(request):
     if request.method == "POST":
@@ -36,7 +39,8 @@ def logout_view(request):
     logout(request)
     return redirect('frontpage')
 
-class profile(DetailView):
+class profile(LoginRequiredMixin, DetailView):
+    login_url = 'login'
     model = Profile
     template_name = 'account_details.html'
     context_object_name = 'profile'
@@ -51,6 +55,7 @@ class profile(DetailView):
         context['profile'] = profile
         return context
 
+@login_required(login_url='login')
 def edit_profile_view(request):
     user = request.user
     if request.method == "POST":
@@ -75,6 +80,7 @@ def edit_profile_view(request):
         'password_form': password_form,
     })
 
+@login_required(login_url='login')
 def delete_profile_view(request):
     if request.method == "POST":
         if 'confirm_delete' in request.POST:
@@ -84,7 +90,13 @@ def delete_profile_view(request):
             return redirect('frontpage')
     return redirect('edit_profile')
 
-class ManageProfilesView(ListView):
+
+class ManageProfilesView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = 'login'
+
+    def test_func(self):
+        return is_admin(self.request.user)
+
     model = Profile
     template_name = 'managers.html'
     context_object_name = 'profiles'
@@ -103,6 +115,8 @@ class ManageProfilesView(ListView):
         context['query'] = query
         return context
 
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
 def promote_to_manager(request, user_id):
     user = get_object_or_404(User, id=user_id)
     client_group = Group.objects.get(name="client")
@@ -113,6 +127,8 @@ def promote_to_manager(request, user_id):
         return redirect("manage_profiles")
     return render(request, 'managers.html', {'user': user})
 
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
 def demote_to_client(request, user_id):
     user = get_object_or_404(User, id=user_id)
     client_group = Group.objects.get(name="client")

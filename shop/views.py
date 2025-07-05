@@ -1,4 +1,6 @@
 import random
+
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404
 from products.models import Product, ProductStock, Size
 from .forms import AddToCartForm, ReturnRequestForm
@@ -9,13 +11,20 @@ from django.contrib import messages
 from .models import Cart, Order, OrderProduct, Profile, Status, ReturnRequest
 from django.db import transaction
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from utils.utils import is_client, is_manager, is_admin, is_manager_or_admin
 
 # Create your views here.
 
 # --- CART VIEWS ---
 # CartSummary, add_to_cart, remove_from_cart, update_cart
 
-class CartSummary(ListView):
+class CartSummary(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = 'login'
+
+    def test_func(self):
+        return is_client(self.request.user)
+
     model = Cart
     template_name = 'cart_summary.html'
     paginate_by = 10
@@ -73,6 +82,8 @@ class CartSummary(ListView):
         }
         return render(request, 'payment.html', context)
 
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def add_to_cart(request):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
@@ -101,6 +112,8 @@ def add_to_cart(request):
             return redirect(request.META.get("HTTP_REFERER", "/"))
     return redirect("homepage")
 
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def remove_from_cart(request):
     if request.method == "POST":
         product_id = request.POST.get("product_id")
@@ -114,6 +127,9 @@ def remove_from_cart(request):
         else:
             return redirect("cart_summary")
     return redirect("cart_summary")
+
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def update_cart(request):
     if request.method == "POST":
         product_id = request.POST.get("product_id")
@@ -146,7 +162,12 @@ def update_cart(request):
 # --- WISHLIST VIEWS ---
 # wishlist, toggle_wishlist
 
-class wishlist(ListView):
+class wishlist(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = 'login'
+
+    def test_func(self):
+        return is_client(self.request.user)
+
     model = Product
     template_name = 'wishlist.html'
     paginate_by = 10
@@ -160,6 +181,8 @@ class wishlist(ListView):
         context['wishlist_items'] = wishlist
         return context
 
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def toggle_wishlist(request, product_id):
     user = request.user
     profile = Profile.objects.get(user=user)
@@ -180,6 +203,8 @@ def toggle_wishlist(request, product_id):
 # --- ORDER VIEWS ---
 # place_order, 0rderSummary, cancel_order, order_change_status, ManagerOrderList, order_return, submit_return_request, return_requests_for_order
 
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def place_order(request):
     user = request.user
     profile = Profile.objects.get(user=user)
@@ -243,7 +268,12 @@ def place_order(request):
     return redirect("cart_summary")
 
 
-class OrderSummery(ListView):
+class OrderSummery(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = 'login'
+
+    def test_func(self):
+        return is_client(self.request.user)
+
     model = Order
     template_name = 'order_summary.html'
     context_object_name = 'orders'
@@ -260,6 +290,8 @@ class OrderSummery(ListView):
         context['orders'] = orders
         return context
 
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def cancel_order(request, order_id):
     user = request.user
     order = get_object_or_404(Order, id=order_id, user__user=user)
@@ -287,6 +319,8 @@ def cancel_order(request, order_id):
         messages.warning(request, f"Error while cancelling the order: {str(e)}")
     return redirect("order_summary")
 
+@login_required(login_url='login')
+@user_passes_test(is_manager_or_admin, login_url='login')
 def order_change_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
@@ -301,7 +335,13 @@ def order_change_status(request, order_id):
         return redirect("manage_orders")
     return redirect("manage_orders")
 
-class ManagerOrderList(ListView):
+
+class ManagerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = 'login'
+
+    def test_func(self):
+        return is_manager_or_admin(self.request.user)
+
     model = Order
     template_name = 'manager_order_list.html'
     context_object_name = 'orders'
@@ -317,7 +357,8 @@ class ManagerOrderList(ListView):
         context['orders'] = orders
         return context
 
-
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 def order_return(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user.profile)
     order_products = OrderProduct.objects.filter(order=order)
@@ -338,6 +379,8 @@ def order_return(request, order_id):
         'order_products': order_products
     })
 
+@login_required(login_url='login')
+@user_passes_test(is_client, login_url='login')
 @transaction.atomic
 def submit_return_request(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user.profile)
@@ -370,6 +413,8 @@ def submit_return_request(request, order_id):
         form = ReturnRequestForm(order=order)
     return render(request, 'return_order.html', {'form': form, 'order': order})
 
+@login_required(login_url='login')
+@user_passes_test(is_manager_or_admin, login_url='login')
 def return_requests_for_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return_requests = ReturnRequest.objects.filter(order=order)
